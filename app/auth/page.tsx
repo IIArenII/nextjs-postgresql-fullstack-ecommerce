@@ -1,0 +1,81 @@
+"use client";
+import { useState } from "react";
+import { handleAuth } from "./actions";
+
+export default function AuthPage() {
+  const [isLogin, setIsLogin] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  async function clientAction(formData: FormData) {
+    setError(null);
+    try {
+      await handleAuth(formData);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError("An unexpected error occurred");
+      }
+    }
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4">
+      <div className="p-8 bg-white shadow-xl rounded-2xl w-full max-w-md border">
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+          {isLogin ? "Welcome Back" : "Join Our Store"}
+        </h2>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
+            {error}
+          </div>
+        )}
+
+        <form action={clientAction} className="flex flex-col gap-4">
+          <input
+            type="hidden"
+            name="type"
+            value={isLogin ? "login" : "register"}
+          />
+
+          {!isLogin && (
+            <input
+              name="name"
+              placeholder="Full Name"
+              className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          )}
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+          <input
+            name="password"
+            type="password"
+            placeholder="Password"
+            className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+
+          <button className="bg-gray-900 text-white p-3 rounded-lg font-bold hover:bg-black transition-all">
+            {isLogin ? "Sign In" : "Create Account"}
+          </button>
+        </form>
+
+        <button
+          onClick={() => setIsLogin(!isLogin)}
+          className="mt-6 text-sm text-gray-500 hover:text-blue-600 transition-colors w-full text-center"
+        >
+          {isLogin
+            ? "New here? Create an account"
+            : "Have an account? Sign in instead"}
+        </button>
+      </div>
+    </div>
+  );
+}

@@ -1,4 +1,6 @@
 import { sql } from "@/lib/db";
+import { UserCircle } from "lucide-react";
+import Link from "next/link";
 
 interface Product {
   id: number;
@@ -27,6 +29,9 @@ export default async function Home() {
           <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
             {products.length} Products Found
           </div>
+          <Link href="/auth" className="hover:text-blue-600 transition">
+            <UserCircle size={28} />
+          </Link>
         </div>
       </header>
 
