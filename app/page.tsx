@@ -1,77 +1,139 @@
 import { sql } from "@/lib/db";
-import { UserCircle } from "lucide-react";
 import Link from "next/link";
+import { AppShell } from "@/components/AppShell";
+import { ProductCard } from "@/components/ProductCard";
+import { ArrowRight, Sparkles } from "lucide-react";
 
 interface Product {
   id: number;
   name: string;
   description: string;
-  price: number;
+  price: unknown;
   category: string;
   image_url?: string; // Optional, in case Mockaroo generated images
 }
 
 export default async function Home() {
-  const products = await sql<Product[]>`
-    SELECT id, name, description, price, category 
-    FROM products 
-    ORDER BY name ASC
+  const categoryRows = await sql<{ category: string; count: number }[]>`
+    SELECT category, COUNT(*)::int AS count
+    FROM products
+    GROUP BY category
+    ORDER BY count DESC, category ASC
+    LIMIT 6
+  `;
+
+  const latestProducts = await sql<Product[]>`
+    SELECT id, name, description, price, category
+    FROM products
+    ORDER BY id DESC
+    LIMIT 9
   `;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header Section */}
-      <header className="bg-white border-b sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-            Storefront<span className="text-blue-600">.</span>
-          </h1>
-          <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
-            {products.length} Products Found
+    <AppShell
+      title={
+        <span className="inline-flex items-center gap-3">
+          <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-sm">
+            <Sparkles className="h-5 w-5" />
+          </span>
+          A modern storefront demo
+        </span>
+      }
+      subtitle="Browse by category, open any product for details, and explore the full catalog without cramming everything onto one screen."
+    >
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950 lg:col-span-2">
+          <div className="flex items-end justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">
+                Browse categories
+              </h2>
+              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                Jump into a section to see only what you care about.
+              </p>
+            </div>
+            <Link
+              href="/categories"
+              className="text-sm font-semibold text-blue-700 hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-200"
+            >
+              View all <ArrowRight className="inline h-4 w-4" />
+            </Link>
           </div>
-          <Link href="/auth" className="hover:text-blue-600 transition">
-            <UserCircle size={28} />
+
+          <div className="mt-5 grid gap-4 sm:grid-cols-2">
+            {categoryRows.map((row) => (
+              <Link
+                key={row.category}
+                href={`/categories/${encodeURIComponent(row.category)}`}
+                className="group rounded-2xl border border-slate-200 bg-linear-to-b from-white to-slate-50 p-5 transition hover:-translate-y-0.5 hover:shadow-md dark:border-slate-800 dark:from-slate-950 dark:to-slate-900/30"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-base font-semibold tracking-tight text-slate-900 dark:text-white">
+                      {row.category}
+                    </div>
+                    <div className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                      {row.count} product{row.count === 1 ? "" : "s"}
+                    </div>
+                  </div>
+                  <ArrowRight className="h-5 w-5 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-slate-700 dark:text-slate-500 dark:group-hover:text-slate-200" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+          <h2 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">
+            Explore
+          </h2>
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+            Prefer the full catalog view?
+          </p>
+
+          <div className="mt-5 space-y-3">
+            <Link
+              href="/products"
+              className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold text-slate-900 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900/30 dark:text-white dark:hover:bg-slate-900/50"
+            >
+              View all products
+              <ArrowRight className="h-5 w-5 text-slate-500" />
+            </Link>
+            <Link
+              href="/categories"
+              className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-semibold text-slate-900 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900/30 dark:text-white dark:hover:bg-slate-900/50"
+            >
+              Browse categories
+              <ArrowRight className="h-5 w-5 text-slate-500" />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-14">
+        <div className="mb-5 flex items-end justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
+              Latest products
+            </h2>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+              A quick peek at what’s in the database.
+            </p>
+          </div>
+          <Link
+            href="/products"
+            className="text-sm font-semibold text-blue-700 hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-200"
+          >
+            View all <ArrowRight className="inline h-4 w-4" />
           </Link>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
-            >
-              {/* Product Info */}
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-2">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-blue-500 bg-blue-50 px-2 py-1 rounded">
-                    {product.category}
-                  </span>
-                </div>
-
-                <h2 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
-                  {product.name}
-                </h2>
-
-                <p className="text-gray-600 text-sm line-clamp-2 mb-4">
-                  {product.description}
-                </p>
-
-                <div className="pt-4 border-t border-gray-100 flex justify-between items-center">
-                  <span className="text-2xl font-bold text-gray-900">
-                    ${Number(product.price).toFixed(2)}
-                  </span>
-                  <button className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
-                    View Details
-                  </button>
-                </div>
-              </div>
-            </div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {latestProducts.map((p) => (
+            <ProductCard key={p.id} product={p} />
           ))}
         </div>
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }

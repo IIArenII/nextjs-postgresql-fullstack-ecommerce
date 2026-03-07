@@ -1,15 +1,22 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { handleAuth } from "./actions";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   async function clientAction(formData: FormData) {
     setError(null);
     try {
-      await handleAuth(formData);
+      const result = await handleAuth(formData);
+      if (result && "success" in result && result.success) {
+        router.push("/");
+        return;
+      }
     } catch (e: unknown) {
       if (e instanceof Error) {
         setError(e.message);
@@ -20,14 +27,17 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4">
-      <div className="p-8 bg-white shadow-xl rounded-2xl w-full max-w-md border">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4 dark:bg-slate-950">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
+      <div className="p-8 bg-white shadow-xl rounded-2xl w-full max-w-md border dark:bg-slate-900 dark:border-slate-800">
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-slate-100">
           {isLogin ? "Welcome Back" : "Join Our Store"}
         </h2>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
+          <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100 dark:bg-red-950/30 dark:border-red-900/50 dark:text-red-400">
             {error}
           </div>
         )}
@@ -43,7 +53,7 @@ export default function AuthPage() {
             <input
               name="name"
               placeholder="Full Name"
-              className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+              className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
               required
             />
           )}
@@ -51,14 +61,14 @@ export default function AuthPage() {
             name="email"
             type="email"
             placeholder="Email"
-            className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+            className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             required
           />
           <input
             name="password"
             type="password"
             placeholder="Password"
-            className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500"
+            className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
             required
           />
 
@@ -69,7 +79,7 @@ export default function AuthPage() {
 
         <button
           onClick={() => setIsLogin(!isLogin)}
-          className="mt-6 text-sm text-gray-500 hover:text-blue-600 transition-colors w-full text-center"
+          className="mt-6 text-sm text-gray-500 hover:text-blue-600 transition-colors w-full text-center dark:text-slate-400 dark:hover:text-blue-400"
         >
           {isLogin
             ? "New here? Create an account"

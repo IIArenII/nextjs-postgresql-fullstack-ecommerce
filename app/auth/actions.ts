@@ -4,7 +4,6 @@ import { sql } from "@/lib/db";
 import bcrypt from "bcrypt";
 import { SignJWT } from "jose";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 const secret = new TextEncoder().encode(
   process.env.JWT_SECRET || "your-secret-key-change-me",
@@ -53,5 +52,11 @@ export async function handleAuth(formData: FormData) {
     maxAge: 60 * 60 * 24,
   });
 
-  redirect("/");
+  return { success: true };
+}
+
+export async function logout() {
+  const cookieStore = await cookies();
+  cookieStore.delete("session");
+  return { success: true };
 }
