@@ -16,28 +16,31 @@ export async function handleAuth(formData: FormData) {
   const name = formData.get("name") as string;
 
   let userId: string;
+  let role: "Buyer" | "Seller" = "Buyer";
 
   if (type === "register") {
     const hash = await bcrypt.hash(password, 10);
+    role = formData.get("role") === "seller" ? "Seller" : "Buyer";
     // UUID is generated automatically by 'gen_random_uuid()' in your SQL schema
     const [newUser] = await sql`
-      INSERT INTO users (email, password_hash, name) 
-      VALUES (${email}, ${hash}, ${name})
+      INSERT INTO users (email, password_hash, name, role)
+      VALUES (${email}, ${hash}, ${name}, ${role})
       RETURNING id
     `;
     userId = newUser.id;
   } else {
     const [user] =
-      await sql`SELECT id, password_hash FROM users WHERE email = ${email}`;
+      await sql`SELECT id, password_hash, role FROM users WHERE email = ${email}`;
 
     if (!user || !(await bcrypt.compare(password, user.password_hash))) {
       throw new Error("Invalid email or password");
     }
     userId = user.id;
+    role = user.role as "Buyer" | "Seller";
   }
 
   // Create JWT Session with the UUID
-  const token = await new SignJWT({ userId })
+  const token = await new SignJWT({ userId, role })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("24h")
@@ -52,7 +55,7 @@ export async function handleAuth(formData: FormData) {
     maxAge: 60 * 60 * 24,
   });
 
-  return { success: true };
+  return { success: true, role };
 }
 
 export async function logout() {

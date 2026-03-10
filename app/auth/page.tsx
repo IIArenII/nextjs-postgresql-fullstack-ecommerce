@@ -14,7 +14,11 @@ export default function AuthPage() {
     try {
       const result = await handleAuth(formData);
       if (result && "success" in result && result.success) {
-        router.push("/");
+        if (result.role === "Seller") {
+          router.push("/seller");
+        } else {
+          router.push("/");
+        }
         return;
       }
     } catch (e: unknown) {
@@ -57,6 +61,36 @@ export default function AuthPage() {
               required
             />
           )}
+
+          {!isLogin && (
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-slate-300">
+                I am a...
+              </label>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 dark:text-slate-300">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="buyer"
+                    defaultChecked
+                    className="accent-blue-600"
+                  />
+                  Buyer
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 dark:text-slate-300">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="seller"
+                    className="accent-blue-600"
+                  />
+                  Seller
+                </label>
+              </div>
+            </div>
+          )}
+
           <input
             name="email"
             type="email"
