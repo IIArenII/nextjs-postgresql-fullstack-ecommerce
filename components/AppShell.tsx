@@ -3,6 +3,7 @@ import { ShoppingBag, Store, Tag, UserCircle } from "lucide-react";
 import { LogoutButton } from "./LogoutButton";
 import { ThemeToggle } from "./ThemeToggle";
 import { getSession } from "@/lib/auth";
+import { BagButton } from "./BagButton";
 
 export async function AppShell({
   children,
@@ -46,6 +47,15 @@ export async function AppShell({
               <ShoppingBag className="h-4 w-4" />
               Products
             </Link>
+            {session?.role === "Buyer" && (
+              <Link
+                href="/orders"
+                className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
+              >
+                <ShoppingBag className="h-4 w-4" />
+                My Orders
+              </Link>
+            )}
             {session?.role === "Seller" && (
               <Link
                 href="/seller"
@@ -58,8 +68,17 @@ export async function AppShell({
           </nav>
 
           <div className="ml-auto flex items-center gap-2">
+            {(!session || session.role === "Buyer") && <BagButton />}
             <ThemeToggle />
-            {!session && (
+            {session ? (
+              <Link
+                href="/account"
+                className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
+              >
+                <UserCircle className="h-5 w-5 text-blue-600" />
+                <span className="hidden sm:inline">Settings</span>
+              </Link>
+            ) : (
               <Link
                 href="/auth"
                 className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"

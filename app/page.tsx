@@ -10,7 +10,8 @@ interface Product {
   description: string;
   price: unknown;
   category: string;
-  image_url?: string; // Optional, in case Mockaroo generated images
+  image_url?: string;
+  discount_percent?: number;
 }
 
 export default async function Home() {
@@ -23,7 +24,7 @@ export default async function Home() {
   `;
 
   const latestProducts = await sql<Product[]>`
-    SELECT id, name, description, price, category
+    SELECT id, name, description, price, category, discount_percent
     FROM products
     ORDER BY id DESC
     LIMIT 9

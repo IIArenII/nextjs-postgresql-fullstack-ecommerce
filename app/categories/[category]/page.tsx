@@ -10,6 +10,8 @@ type Product = {
   description: string;
   price: unknown;
   category: string;
+  stock_num?: number;
+  discount_percent?: number;
 };
 
 const PAGE_SIZE = 20;
@@ -39,7 +41,7 @@ export default async function CategoryPage({
       WHERE category = ${decodedCategory}
     `,
     sql<Product[]>`
-      SELECT id, name, description, price, category
+      SELECT id, name, description, price, category, stock_num, discount_percent
       FROM products
       WHERE category = ${decodedCategory}
       ORDER BY name ASC

@@ -9,6 +9,8 @@ type Product = {
   description: string;
   price: unknown;
   category: string;
+  stock_num?: number;
+  discount_percent?: number;
 };
 
 const PAGE_SIZE = 20;
@@ -41,7 +43,7 @@ export default async function ProductsPage({
       FROM products
     `,
     sql<Product[]>`
-      SELECT id, name, description, price, category
+      SELECT id, name, description, price, category, stock_num, discount_percent
       FROM products
       ORDER BY category ASC, name ASC
       LIMIT ${PAGE_SIZE} OFFSET ${offset}

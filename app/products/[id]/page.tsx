@@ -5,6 +5,8 @@ import { AppShell } from "@/components/AppShell";
 import { formatCurrencyUSD } from "@/lib/format";
 import { ProductCard } from "@/components/ProductCard";
 import { Tag } from "lucide-react";
+import { ProductPurchaseSection } from "@/components/ProductPurchaseSection";
+import { getSession } from "@/lib/auth";
 
 type Product = {
   id: number;
@@ -12,6 +14,8 @@ type Product = {
   description: string;
   price: unknown;
   category: string;
+  stock_num?: number;
+  discount_percent?: number;
 };
 
 export default async function ProductDetailPage({
@@ -23,8 +27,10 @@ export default async function ProductDetailPage({
   const productId = Number(id);
   if (!Number.isInteger(productId)) notFound();
 
+  const session = await getSession();
+
   const products = await sql<Product[]>`
-    SELECT id, name, description, price, category
+    SELECT id, name, description, price, category, stock_num, discount_percent
     FROM products
     WHERE id = ${productId}
     LIMIT 1
@@ -33,7 +39,7 @@ export default async function ProductDetailPage({
   if (!product) notFound();
 
   const related = await sql<Product[]>`
-    SELECT id, name, description, price, category
+    SELECT id, name, description, price, category, stock_num, discount_percent
     FROM products
     WHERE category = ${product.category} AND id <> ${product.id}
     ORDER BY name ASC
@@ -80,17 +86,55 @@ export default async function ProductDetailPage({
 
         <div className="lg:col-span-3">
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950">
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
                   Price
                 </div>
-                <div className="mt-1 text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">
-                  {formatCurrencyUSD(product.price)}
+                <div className="mt-1 text-3xl font-bold tracking-tight text-slate-900 dark:text-white flex items-end gap-3">
+                  {product.discount_percent && product.discount_percent > 0 ? (
+                    <>
+                      <span className="text-red-600 dark:text-red-400">
+                        {formatCurrencyUSD(Math.round(Number(product.price) * (1 - product.discount_percent / 100)))}
+                      </span>
+                      <span className="text-lg text-slate-400 line-through pb-1 font-medium">
+                        {formatCurrencyUSD(product.price)}
+                      </span>
+                      <span className="text-sm bg-red-100 text-red-700 px-2 py-0.5 rounded-lg mb-2 inline-block font-bold dark:bg-red-950/30 dark:text-red-300">
+                        -{product.discount_percent}%
+                      </span>
+                    </>
+                  ) : (
+                    formatCurrencyUSD(product.price)
+                  )}
+                  {product.stock_num !== undefined && (
+                    <span className="text-sm font-medium pb-1 ml-1">
+                      {product.stock_num > 0 ? (
+                        <span className="text-emerald-600 dark:text-emerald-400">({product.stock_num} in stock)</span>
+                      ) : (
+                        <span className="text-red-500 font-bold dark:text-red-400">Sold Out</span>
+                      )}
+                    </span>
+                  )}
                 </div>
               </div>
+              
+              {(!session || session.role === "Buyer") && (
+                <div className="mt-4 w-full">
+                  <ProductPurchaseSection 
+                    product={{
+                      id: product.id,
+                      name: product.name,
+                      price: product.discount_percent && product.discount_percent > 0 
+                        ? Math.round(Number(product.price) * (1 - product.discount_percent / 100))
+                        : Number(product.price),
+                      stock_num: product.stock_num ?? 0
+                    }} 
+                    isAuthenticated={!!session} 
+                  />
+                </div>
+              )}
             </div>
-
             <div className="mt-6 border-t border-slate-100 pt-5 text-sm leading-relaxed text-slate-700 dark:border-slate-900 dark:text-slate-200">
               {product.description}
             </div>
