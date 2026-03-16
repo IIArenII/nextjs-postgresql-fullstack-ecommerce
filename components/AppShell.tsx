@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ShoppingBag, Store, Tag, UserCircle } from "lucide-react";
+import { ShoppingBag, Store, Tag, UserCircle, Package } from "lucide-react";
 import { LogoutButton } from "./LogoutButton";
 import { ThemeToggle } from "./ThemeToggle";
 import { getSession } from "@/lib/auth";
@@ -19,50 +19,55 @@ export async function AppShell({
   return (
     <div className="min-h-screen bg-linear-to-b from-slate-50 to-white text-slate-900 dark:from-slate-950 dark:to-slate-950 dark:text-slate-50">
       <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-white/75 backdrop-blur dark:border-slate-800/70 dark:bg-slate-950/60">
-        <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3 sm:px-6">
+        <div className="mx-auto flex max-w-6xl items-center gap-2 px-2 py-3 sm:gap-4 sm:px-6">
           <Link
             href="/"
-            className="flex items-center gap-2 rounded-lg px-2 py-1 text-sm font-semibold tracking-tight hover:bg-slate-100 dark:hover:bg-slate-900"
+            className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm font-semibold tracking-tight hover:bg-slate-100 dark:hover:bg-slate-900"
           >
             <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900">
               <ShoppingBag className="h-5 w-5" />
             </span>
-            <span className="hidden sm:inline">
+            <span className="hidden lg:inline">
               Storefront<span className="text-blue-600">.</span>
             </span>
           </Link>
 
-          <nav className="flex items-center gap-1">
+          <nav className="flex items-center gap-0.5 sm:gap-1">
+            {/* Hide Categories on small mobile - users can find it in Products or Footer */}
             <Link
               href="/categories"
-              className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
+              title="Categories"
+              className="hidden sm:inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
             >
               <Tag className="h-4 w-4" />
-              Categories
+              <span className="hidden md:inline">Categories</span>
             </Link>
             <Link
               href="/products"
-              className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
+              title="Products"
+              className="inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
             >
               <ShoppingBag className="h-4 w-4" />
-              Products
+              <span className="hidden md:inline">Products</span>
             </Link>
             {session?.role === "Buyer" && (
               <Link
                 href="/orders"
-                className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
+                title="My Orders"
+                className="inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
               >
-                <ShoppingBag className="h-4 w-4" />
-                My Orders
+                <Package className="h-4 w-4" />
+                <span className="hidden md:inline">My Orders</span>
               </Link>
             )}
             {session && (
               <Link
                 href="/seller"
-                className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
+                title="Sell"
+                className="inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
               >
                 <Store className="h-4 w-4" />
-                Sell
+                <span className="hidden md:inline">Sell</span>
               </Link>
             )}
           </nav>

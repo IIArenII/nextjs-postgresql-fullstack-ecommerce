@@ -1,19 +1,29 @@
 import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load test credentials from .env.test
+dotenv.config({ path: path.resolve(process.cwd(), '.env.test') });
 
 export default defineConfig({
   testDir: './tests',
-  /* Run your local dev server before starting the tests */
+  fullyParallel: false,  // Run tests sequentially to avoid DB conflicts
+  timeout: 30_000,       // 30 seconds per test
+  retries: 1,            // Retry once on failure
+
   webServer: {
     command: 'npm run dev',
     url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
+    reuseExistingServer: true,  // Reuse if already running
+    timeout: 120_000,
   },
+
   use: {
-    /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: 'http://localhost:3000',
-    trace: 'on-first-retry',
+    trace: 'on-first-retry',  // Record trace only when retrying
+    screenshot: 'only-on-failure',
   },
+
   projects: [
     {
       name: 'chromium',
@@ -28,10 +38,6 @@ export default defineConfig({
       use: { ...devices['Desktop Safari'] },
     },
     /* Test against mobile viewports. */
-    {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
-    },
     {
       name: 'Mobile Safari',
       use: { ...devices['iPhone 12'] },

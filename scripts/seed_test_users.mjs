@@ -16,16 +16,16 @@ import bcrypt from "bcrypt";
 //  FILL IN YOUR TEST CREDENTIALS HERE
 // ─────────────────────────────────────────────
 const TEST_BUYER = {
-  name: "Test Buyer",
-  email: "YOUR_BUYER_EMAIL@example.com", // ← change this
-  password: "YOUR_BUYER_PASSWORD",       // ← change this
+  name: "Eren",
+  email: "evlieren4@gmail.com", 
+  password: "Eren123*",       
   role: "Buyer",
 };
 
 const TEST_SELLER = {
-  name: "Test Seller",
-  email: "YOUR_SELLER_EMAIL@example.com", // ← change this
-  password: "YOUR_SELLER_PASSWORD",        // ← change this
+  name: "Eren",
+  email: "aerenevli@gmail.com", 
+  password: "Eren123*",        
   role: "Seller",
 };
 // ─────────────────────────────────────────────

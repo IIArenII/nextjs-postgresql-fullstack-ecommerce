@@ -116,6 +116,7 @@ export default function AuthPage() {
                 required
               />
               <button 
+                type="submit"
                 disabled={isVerifying}
                 className="bg-blue-600 text-white p-3 rounded-lg font-bold hover:bg-blue-700 transition-all disabled:opacity-50"
               >
@@ -194,7 +195,10 @@ export default function AuthPage() {
             required
           />
 
-          <button className="bg-gray-900 text-white p-3 rounded-lg font-bold hover:bg-black transition-all">
+          <button 
+            type="submit"
+            className="bg-gray-900 text-white p-3 rounded-lg font-bold hover:bg-black transition-all dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
+          >
             {isLogin ? "Sign In" : "Create Account"}
           </button>
         </form>
