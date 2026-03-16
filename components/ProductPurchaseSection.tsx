@@ -55,23 +55,6 @@ export function ProductPurchaseSection({
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
-            Price
-          </div>
-          <div className="mt-1 text-3xl font-semibold tracking-tight text-slate-900 dark:text-white flex items-end gap-3">
-            {formatCurrencyUSD(product.price)}
-            <span className="text-sm font-medium pb-1">
-              {product.stock_num > 0 ? (
-                <span className="text-emerald-600 dark:text-emerald-400">({product.stock_num} in stock)</span>
-              ) : (
-                <span className="text-red-500 font-bold dark:text-red-400">Sold Out</span>
-              )}
-            </span>
-          </div>
-        </div>
-      </div>
 
       {product.stock_num > 0 && (
         <div className="flex flex-col gap-4">

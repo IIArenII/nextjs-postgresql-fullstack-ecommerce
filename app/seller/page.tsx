@@ -1,18 +1,21 @@
+import Link from "next/link";
+import { Store } from "lucide-react";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { sql } from "@/lib/db";
 import { AppShell } from "@/components/AppShell";
-import { ProductCard } from "@/components/ProductCard";
-import { addProduct, updateStock } from "./actions";
+import { addProduct } from "./actions";
 import { formatCurrencyUSD } from "@/lib/format";
 import { StatusSelect } from "@/components/StatusSelect";
 import { ProductListing } from "@/components/ProductListing";
 
 export default async function SellerPage() {
   const session = await getSession();
-  if (!session || session.role !== "Seller") redirect("/auth");
+  if (!session) redirect("/auth");
 
-  const listings = await sql<{
+  const isSeller = session.role === "Seller";
+
+  const listings = isSeller ? await sql<{
     id: number;
     name: string;
     description: string;
@@ -25,11 +28,11 @@ export default async function SellerPage() {
     FROM products
     WHERE seller_id = ${session.userId}
     ORDER BY id DESC
-  `;
+  ` : [];
 
-  const categories = await sql<{ category: string }[]>`
+  const categories = isSeller ? await sql<{ category: string }[]>`
     SELECT DISTINCT category FROM products WHERE seller_id = ${session.userId} ORDER BY category ASC
-  `;
+  ` : [];
 
   const PRODUCT_CATEGORIES = [
     "Books",
@@ -49,7 +52,7 @@ export default async function SellerPage() {
     "Other",
   ];
 
-  const orders = await sql<{
+  const orders = isSeller ? await sql<{
     id: string;
     product_name: string;
     product_id: number;
@@ -73,13 +76,34 @@ export default async function SellerPage() {
     JOIN users u ON o.buyer_id = u.id
     WHERE p.seller_id = ${session.userId}
     ORDER BY o.created_at DESC
-  `;
+  ` : [];
 
   return (
     <AppShell
       title="Seller Dashboard"
-      subtitle="Manage your listings and fulfill customer orders."
+      subtitle={isSeller ? "Manage your listings and fulfill customer orders." : "Want to start selling? Switch your role in account settings."}
     >
+      {!isSeller && (
+        <div className="mb-10 rounded-2xl border border-blue-200 bg-blue-50 p-8 dark:border-blue-900/50 dark:bg-blue-950/20">
+          <div className="flex flex-col items-center text-center gap-4">
+            <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-md">
+              <Store className="h-7 w-7" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">You&apos;re browsing as a Buyer</h3>
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 max-w-sm">
+                This is the Seller Dashboard. To list products and manage orders, you need to switch your account role to <strong>Seller</strong>.
+              </p>
+            </div>
+            <Link
+              href="/account"
+              className="mt-2 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 hover:-translate-y-0.5"
+            >
+              Go to Account Settings → Switch to Seller
+            </Link>
+          </div>
+        </div>
+      )}
       {/* Customer Orders */}
       <section className="mb-14">
         <h2 className="text-xl font-semibold tracking-tight mb-4">
@@ -156,75 +180,87 @@ export default async function SellerPage() {
         <h2 className="text-xl font-semibold tracking-tight mb-4">
           List a New Product
         </h2>
-        <form
-          action={addProduct}
-          className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950 flex flex-col gap-4 max-w-xl"
-        >
-          <input
-            name="name"
-            placeholder="Product name"
-            required
-            className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-          />
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              name="price"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="Price (e.g. 29.99)"
-              required
-              className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-            />
-            <input
-              name="stock_num"
-              type="number"
-              step="1"
-              min="0"
-              placeholder="Stock"
-              required
-              className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-            />
-            <input
-              name="discount_percent"
-              type="number"
-              step="1"
-              min="0"
-              max="100"
-              placeholder="Discount %"
-              className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-            />
-          </div>
-          <textarea
-            name="description"
-            placeholder="Description"
-            rows={3}
-            required
-            className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 resize-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-          />
-          <div>
-            <label className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">
-              Category
-            </label>
-            <select
-              name="category"
-              required
-              defaultValue=""
-              className="w-full border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 bg-white cursor-pointer"
-            >
-              <option value="" disabled>Select a category...</option>
-              {PRODUCT_CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-          </div>
-          <button
-            type="submit"
-            className="bg-slate-900 text-white p-3 rounded-lg font-bold hover:bg-black transition-all dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
+        {isSeller ? (
+          <form
+            action={addProduct}
+            className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950 flex flex-col gap-4 max-w-xl"
           >
-            List Product
-          </button>
-        </form>
+            <input
+              name="name"
+              placeholder="Product name"
+              required
+              className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+            />
+            <div className="grid grid-cols-2 gap-4">
+              <input
+                name="price"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="Price (e.g. 29.99)"
+                required
+                className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+              />
+              <input
+                name="stock_num"
+                type="number"
+                step="1"
+                min="0"
+                placeholder="Stock"
+                required
+                className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+              />
+              <input
+                name="discount_percent"
+                type="number"
+                step="1"
+                min="0"
+                max="100"
+                placeholder="Discount %"
+                className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+              />
+            </div>
+            <textarea
+              name="description"
+              placeholder="Description"
+              rows={3}
+              required
+              className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 resize-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+            />
+            <div>
+              <label className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">
+                Category
+              </label>
+              <select
+                name="category"
+                required
+                defaultValue=""
+                className="w-full border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 bg-white cursor-pointer"
+              >
+                <option value="" disabled>Select a category...</option>
+                {PRODUCT_CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+            <button
+              type="submit"
+              className="bg-slate-900 text-white p-3 rounded-lg font-bold hover:bg-black transition-all dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
+            >
+              List Product
+            </button>
+          </form>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-10 max-w-xl text-center dark:border-slate-700 dark:bg-slate-900/30">
+            <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
+              🔒 This section is for Sellers only. Want to list your own products?{" "}
+              <Link href="/account" className="font-semibold text-blue-600 hover:underline dark:text-blue-400">
+                Go to Account Settings
+              </Link>{" "}
+              and switch your role to <strong>Seller</strong>.
+            </p>
+          </div>
+        )}
       </section>
     </AppShell>
   );

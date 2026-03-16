@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { handleAuth, verifyEmailCode } from "./actions";
+import { OAuthButtons } from "@/components/OAuthButtons";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -200,14 +201,17 @@ export default function AuthPage() {
         )}
 
         {!verificationSent && (
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="mt-6 text-sm text-gray-500 hover:text-blue-600 transition-colors w-full text-center dark:text-slate-400 dark:hover:text-blue-400"
-          >
-            {isLogin
-              ? "New here? Create an account"
-              : "Have an account? Sign in instead"}
-          </button>
+          <>
+            <OAuthButtons />
+            <button
+              onClick={() => setIsLogin(!isLogin)}
+              className="mt-6 text-sm text-gray-500 hover:text-blue-600 transition-colors w-full text-center dark:text-slate-400 dark:hover:text-blue-400"
+            >
+              {isLogin
+                ? "New here? Create an account"
+                : "Have an account? Sign in instead"}
+            </button>
+          </>
         )}
       </div>
     </div>

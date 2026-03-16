@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { updateAccount } from "@/app/account/actions";
-import { User, Lock, Mail, CheckCircle2, AlertCircle, ShieldCheck } from "lucide-react";
+import { updateAccount, changeRole } from "@/app/account/actions";
+import { User, Lock, Mail, CheckCircle2, AlertCircle, ShieldCheck, ArrowLeftRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export function AccountForm({ user }: { user: any }) {
   const [isPending, setIsPending] = useState(false);
+  const [roleChangePending, setRoleChangePending] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const router = useRouter();
 
   async function handleSubmit(formData: FormData) {
     setIsPending(true);
@@ -99,9 +102,58 @@ export function AccountForm({ user }: { user: any }) {
                 </div>
                 <ShieldCheck className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               </div>
-              <p className="mt-1.5 text-xs text-slate-400">Your account role cannot be changed.</p>
+              <p className="mt-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400">
+                ↓ You can switch your role in the section below
+              </p>
             </div>
           </div>
+        </div>
+
+        {/* Role Switcher Section */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+            <ArrowLeftRight className="w-5 h-5 text-blue-600" /> Switch Role
+          </h3>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+            You are currently a{" "}
+            <span className={`font-bold ${user.role === 'Seller' ? 'text-purple-600 dark:text-purple-400' : 'text-blue-600 dark:text-blue-400'}`}>
+              {user.role}
+            </span>.
+            {user.role === 'Buyer'
+              ? " Switch to Seller to list products and manage orders."
+              : " Switch to Buyer to purchase products."}
+          </p>
+
+          <div className="p-3 rounded-xl bg-amber-50 border border-amber-100 dark:bg-amber-950/30 dark:border-amber-900/50 text-xs text-amber-700 dark:text-amber-400 mb-5">
+            ⚠️ Switching roles changes what you can do immediately. Your previous data (orders, listings) stays in the database.
+          </div>
+
+          <button
+            type="button"
+            disabled={roleChangePending}
+            onClick={async () => {
+              const newRole = user.role === 'Buyer' ? 'Seller' : 'Buyer';
+              if (!confirm(`Are you sure you want to switch to ${newRole}?`)) return;
+              setRoleChangePending(true);
+              setMessage(null);
+              try {
+                await changeRole(newRole);
+                setMessage({ type: 'success', text: `Role changed to ${newRole}! Refreshing...` });
+                setTimeout(() => router.refresh(), 1000);
+              } catch (e: any) {
+                setMessage({ type: 'error', text: e.message });
+              } finally {
+                setRoleChangePending(false);
+              }
+            }}
+            className={`w-full rounded-xl px-6 py-3 text-sm font-bold text-white transition disabled:opacity-50 hover:-translate-y-0.5 active:translate-y-0 ${
+              user.role === 'Buyer'
+                ? 'bg-purple-600 hover:bg-purple-700'
+                : 'bg-blue-600 hover:bg-blue-700'
+            }`}
+          >
+            {roleChangePending ? 'Switching...' : `Switch to ${user.role === 'Buyer' ? 'Seller' : 'Buyer'}`}
+          </button>
         </div>
 
         {/* Password Section */}
