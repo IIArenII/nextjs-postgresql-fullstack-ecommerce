@@ -4,6 +4,7 @@ import { LogoutButton } from "./LogoutButton";
 import { ThemeToggle } from "./ThemeToggle";
 import { getSession } from "@/lib/auth";
 import { BagButton } from "./BagButton";
+import { SearchInput } from "./SearchInput";
 
 export async function AppShell({
   children,
@@ -22,6 +23,7 @@ export async function AppShell({
         <div className="mx-auto flex max-w-6xl items-center gap-2 px-2 py-3 sm:gap-4 sm:px-6">
           <Link
             href="/"
+            aria-label="Storefront Home"
             className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm font-semibold tracking-tight hover:bg-slate-100 dark:hover:bg-slate-900"
           >
             <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900">
@@ -37,6 +39,7 @@ export async function AppShell({
             <Link
               href="/categories"
               title="Categories"
+              aria-label="Categories"
               className="hidden sm:inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
             >
               <Tag className="h-4 w-4" />
@@ -45,6 +48,7 @@ export async function AppShell({
             <Link
               href="/products"
               title="Products"
+              aria-label="Products"
               className="inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
             >
               <ShoppingBag className="h-4 w-4" />
@@ -54,6 +58,7 @@ export async function AppShell({
               <Link
                 href="/orders"
                 title="My Orders"
+                aria-label="My Orders"
                 className="inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
               >
                 <Package className="h-4 w-4" />
@@ -64,6 +69,7 @@ export async function AppShell({
               <Link
                 href="/seller"
                 title="Sell"
+                aria-label="Sell"
                 className="inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
               >
                 <Store className="h-4 w-4" />
@@ -72,12 +78,18 @@ export async function AppShell({
             )}
           </nav>
 
+          <div className="flex-1 flex justify-center">
+            <SearchInput />
+          </div>
+
           <div className="ml-auto flex items-center gap-2">
             {(!session || session.role === "Buyer") && <BagButton />}
             <ThemeToggle />
             {session ? (
               <Link
                 href="/account"
+                title="Account Settings"
+                aria-label="Account Settings"
                 className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
               >
                 <UserCircle className="h-5 w-5 text-blue-600" />
@@ -86,6 +98,8 @@ export async function AppShell({
             ) : (
               <Link
                 href="/auth"
+                title="Sign In"
+                aria-label="Sign In"
                 className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
               >
                 <UserCircle className="h-5 w-5" />
@@ -132,4 +146,3 @@ export async function AppShell({
     </div>
   );
 }
-

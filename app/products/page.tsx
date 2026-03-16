@@ -29,22 +29,34 @@ function groupByCategory(products: Product[]) {
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; q?: string }>;
 }) {
-  const { page } = await searchParams;
+  const { page, q } = await searchParams;
   const parsedPage = Number(page);
   const currentPage =
     Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   const offset = (currentPage - 1) * PAGE_SIZE;
 
+  const searchQuery = q ? `%${q}%` : null;
+
   const [countRows, products] = await Promise.all([
     sql<{ count: number }[]>`
       SELECT COUNT(*)::int AS count
       FROM products
+      WHERE ${
+        searchQuery 
+          ? sql`name ILIKE ${searchQuery} OR category ILIKE ${searchQuery} OR description ILIKE ${searchQuery}` 
+          : sql`TRUE`
+      }
     `,
     sql<Product[]>`
       SELECT id, name, description, price, category, stock_num, discount_percent
       FROM products
+      WHERE ${
+        searchQuery 
+          ? sql`name ILIKE ${searchQuery} OR category ILIKE ${searchQuery} OR description ILIKE ${searchQuery}` 
+          : sql`TRUE`
+      }
       ORDER BY category ASC, name ASC
       LIMIT ${PAGE_SIZE} OFFSET ${offset}
     `,
@@ -73,8 +85,19 @@ export default async function ProductsPage({
       }
     >
       {products.length === 0 ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200">
-          No products found yet.
+        <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200">
+          <p className="text-lg font-medium">No products found.</p>
+          {q && (
+            <div className="mt-4">
+              <p className="text-slate-500">We couldn&apos;t find anything matching &quot;{q}&quot;</p>
+              <Link
+                href="/products"
+                className="mt-4 inline-block font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400"
+              >
+                Clear search
+              </Link>
+            </div>
+          )}
         </div>
       ) : (
         <>
