@@ -7,6 +7,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { Tag } from "lucide-react";
 import { ProductPurchaseSection } from "@/components/ProductPurchaseSection";
 import { getSession } from "@/lib/auth";
+import { FavoriteButton } from "@/components/FavoriteButton";
 
 type Product = {
   id: number;
@@ -16,6 +17,8 @@ type Product = {
   category: string;
   stock_num?: number;
   discount_percent?: number;
+  is_favorited?: boolean;
+  image_url?: string;
 };
 
 export default async function ProductDetailPage({
@@ -28,9 +31,11 @@ export default async function ProductDetailPage({
   if (!Number.isInteger(productId)) notFound();
 
   const session = await getSession();
+  const userId = session?.userId ?? '00000000-0000-0000-0000-000000000000';
 
   const products = await sql<Product[]>`
-    SELECT id, name, description, price, category, stock_num, discount_percent
+    SELECT id, name, description, price, category, stock_num, discount_percent, image_url,
+      EXISTS(SELECT 1 FROM favorite_products WHERE product_id = products.id AND user_id = ${userId}::uuid) AS is_favorited
     FROM products
     WHERE id = ${productId}
     LIMIT 1
@@ -39,7 +44,8 @@ export default async function ProductDetailPage({
   if (!product) notFound();
 
   const related = await sql<Product[]>`
-    SELECT id, name, description, price, category, stock_num, discount_percent
+    SELECT id, name, description, price, category, stock_num, discount_percent, image_url,
+      EXISTS(SELECT 1 FROM favorite_products WHERE product_id = products.id AND user_id = ${userId}::uuid) AS is_favorited
     FROM products
     WHERE category = ${product.category} AND id <> ${product.id}
     ORDER BY name ASC
@@ -70,17 +76,33 @@ export default async function ProductDetailPage({
     >
       <div className="grid gap-8 lg:grid-cols-5">
         <div className="lg:col-span-2">
-          <div className="aspect-4/3 overflow-hidden rounded-2xl border border-slate-200 bg-linear-to-br from-slate-100 to-white shadow-sm dark:border-slate-800 dark:from-slate-900 dark:to-slate-950">
-            <div className="flex h-full w-full items-center justify-center">
-              <div className="text-center">
-                <div className="text-sm font-semibold text-slate-600 dark:text-slate-300">
-                  No image
-                </div>
-                <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                  Product photos are not configured for this demo.
+          <div className="relative aspect-4/3 overflow-hidden rounded-2xl border border-slate-200 bg-linear-to-br from-slate-100 to-white shadow-sm dark:border-slate-800 dark:from-slate-900 dark:to-slate-950">
+            <div className="absolute top-4 right-4 z-10">
+              <FavoriteButton 
+                productId={product.id} 
+                isFavorited={product.is_favorited} 
+                size={24}
+                className="p-3" 
+              />
+            </div>
+            {product.image_url ? (
+              <img
+                src={product.image_url}
+                alt={product.name}
+                className="h-full w-full object-contain"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center">
+                <div className="text-center">
+                  <div className="text-sm font-semibold text-slate-600 dark:text-slate-300">
+                    No image available
+                  </div>
+                  <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    The seller has not uploaded a photo for this product yet.
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
 

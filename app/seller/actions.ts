@@ -15,6 +15,11 @@ export async function addProduct(formData: FormData) {
   const description = (formData.get("description") as string).trim();
   const category = (formData.get("category") as string).trim();
   const discount_percent = parseInt(formData.get("discount_percent") as string, 10) || 0;
+  const image_url = (formData.get("image_url") as string || "").trim();
+
+  if (image_url && !image_url.startsWith("https://")) {
+    throw new Error("Only secure image URLs (starting with https://) are allowed. Local files or insecure links are not accepted.");
+  }
 
   if (
     !category ||
@@ -30,8 +35,8 @@ export async function addProduct(formData: FormData) {
   }
 
   await sql`
-    INSERT INTO products (name, price, stock_num, description, category, seller_id, discount_percent)
-    VALUES (${name}, ${price}, ${stock_num}, ${description}, ${category}, ${session.userId}, ${discount_percent})
+    INSERT INTO products (name, price, stock_num, description, category, seller_id, discount_percent, image_url)
+    VALUES (${name}, ${price}, ${stock_num}, ${description}, ${category}, ${session.userId}, ${discount_percent}, ${image_url})
   `;
 
   redirect("/seller");
@@ -68,6 +73,11 @@ export async function updateProduct(formData: FormData) {
   const description = (formData.get("description") as string).trim();
   const category = (formData.get("category") as string).trim();
   const discount_percent = parseInt(formData.get("discount_percent") as string, 10) || 0;
+  const image_url = (formData.get("image_url") as string || "").trim();
+
+  if (image_url && !image_url.startsWith("https://")) {
+    throw new Error("Only secure image URLs (starting with https://) are allowed.");
+  }
 
   if (
     !description ||
@@ -83,7 +93,7 @@ export async function updateProduct(formData: FormData) {
 
   await sql`
     UPDATE products
-    SET name = ${name}, price = ${price}, description = ${description}, category = ${category}, discount_percent = ${discount_percent}
+    SET name = ${name}, price = ${price}, description = ${description}, category = ${category}, discount_percent = ${discount_percent}, image_url = ${image_url}
     WHERE id = ${productId} AND seller_id = ${session.userId}
   `;
 

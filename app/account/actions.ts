@@ -6,10 +6,12 @@ import bcrypt from "bcrypt";
 import { revalidatePath } from "next/cache";
 import { SignJWT } from "jose";
 import { cookies } from "next/headers";
-
+import { validatePassword } from "@/lib/validation";
 const secret = new TextEncoder().encode(
-  process.env.JWT_SECRET || "your-secret-key-change-me",
+  process.env.JWT_SECRET,
 );
+
+
 
 export async function updateAccount(formData: FormData) {
   const session = await getSession();
@@ -33,7 +35,9 @@ export async function updateAccount(formData: FormData) {
     const isMatch = await bcrypt.compare(currentPassword, user.password_hash);
     if (!isMatch) throw new Error("Current password is incorrect");
 
-    if (newPassword.length < 6) throw new Error("New password must be at least 6 characters");
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) throw new Error(passwordError);
+
     newHash = await bcrypt.hash(newPassword, 10);
   }
 

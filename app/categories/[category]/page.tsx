@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { sql } from "@/lib/db";
+import { getSession } from "@/lib/auth";
 import { AppShell } from "@/components/AppShell";
 import { ProductCard } from "@/components/ProductCard";
 
@@ -12,6 +13,7 @@ type Product = {
   category: string;
   stock_num?: number;
   discount_percent?: number;
+  is_favorited?: boolean;
 };
 
 const PAGE_SIZE = 20;
@@ -34,6 +36,9 @@ export default async function CategoryPage({
 
   if (!decodedCategory) notFound();
 
+  const session = await getSession();
+  const userId = session?.userId ?? '00000000-0000-0000-0000-000000000000';
+
   const [countRows, products] = await Promise.all([
     sql<{ count: number }[]>`
       SELECT COUNT(*)::int AS count
@@ -41,7 +46,8 @@ export default async function CategoryPage({
       WHERE category = ${decodedCategory}
     `,
     sql<Product[]>`
-      SELECT id, name, description, price, category, stock_num, discount_percent
+      SELECT id, name, description, price, category, stock_num, discount_percent, image_url,
+        EXISTS(SELECT 1 FROM favorite_products WHERE product_id = products.id AND user_id = ${userId}::uuid) AS is_favorited
       FROM products
       WHERE category = ${decodedCategory}
       ORDER BY name ASC

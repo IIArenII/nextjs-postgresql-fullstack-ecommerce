@@ -180,20 +180,36 @@ export default function AuthPage() {
             </div>
           )}
 
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-            required
-          />
-          <input
-            name="password"
-            type="password"
-            placeholder="Password"
-            className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
-            required
-          />
+          <div className="flex flex-col gap-1">
+            <input
+              name="email"
+              type="email"
+              placeholder="Email"
+              className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              required
+            />
+            {!isLogin && (
+              <p className="text-xs text-gray-500 dark:text-slate-400 pl-1 mt-1">
+                Only real email addresses are allowed (e.g. Gmail, Outlook).
+              </p>
+            )}
+          </div>
+          <div className="flex flex-col gap-1">
+            <input
+              name="password"
+              type="password"
+              placeholder="Password"
+              minLength={isLogin ? undefined : 8}
+              className="border p-3 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+              required
+            />
+            {!isLogin && (
+              <p className="text-xs text-gray-500 dark:text-slate-400 pl-1 mt-1">
+                At least 8 characters. Use letters, numbers, and symbols (ASCII only). 
+                No accented chars or spaces at edges.
+              </p>
+            )}
+          </div>
 
           <button 
             type="submit"

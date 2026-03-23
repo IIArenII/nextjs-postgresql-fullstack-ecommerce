@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ProductCard } from "./ProductCard";
 import { updateStock, updateProduct } from "@/app/seller/actions";
 import { Edit2, X, Check } from "lucide-react";
+import { ProductImageInput } from "./ProductImageInput";
 
 export function ProductListing({ 
   product, 
@@ -102,6 +103,8 @@ export function ProductListing({
               className="w-full p-2 text-sm border rounded-lg dark:bg-slate-800 dark:border-slate-700 outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             />
           </div>
+          
+          <ProductImageInput defaultValue={product.image_url} />
 
           <button 
             type="submit" 

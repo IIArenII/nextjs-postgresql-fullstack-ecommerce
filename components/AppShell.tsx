@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ShoppingBag, Store, Tag, UserCircle, Package } from "lucide-react";
+import { ShoppingBag, Store, Tag, UserCircle, Package, Heart } from "lucide-react";
 import { LogoutButton } from "./LogoutButton";
 import { ThemeToggle } from "./ThemeToggle";
 import { getSession } from "@/lib/auth";
@@ -67,6 +67,17 @@ export async function AppShell({
             )}
             {session && (
               <Link
+                href="/account/favorites"
+                title="Favorites"
+                aria-label="Favorites"
+                className="hidden sm:inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
+              >
+                <Heart className="h-4 w-4" />
+                <span className="hidden md:inline">Favorites</span>
+              </Link>
+            )}
+            {session && (
+              <Link
                 href="/seller"
                 title="Sell"
                 aria-label="Sell"
@@ -126,7 +137,7 @@ export async function AppShell({
         </div>
       )}
 
-      <main className="mx-auto max-w-6xl px-4 pb-16 pt-8 sm:px-6">
+      <main className={`mx-auto max-w-6xl px-4 pb-16 sm:px-6 ${!(title || subtitle) ? 'pt-4' : 'pt-8'}`}>
         {children}
       </main>
 

@@ -11,6 +11,8 @@ const secret = new TextEncoder().encode(
   process.env.JWT_SECRET || "your-secret-key-change-me",
 );
 
+import { validateEmail, validatePassword } from "@/lib/validation";
+
 export async function handleAuth(formData: FormData) {
   const type = formData.get("type");
   const email = formData.get("email") as string;
@@ -21,6 +23,13 @@ export async function handleAuth(formData: FormData) {
   let role: "Buyer" | "Seller" = "Buyer";
 
   if (type === "register") {
+    // Validate Gmail and Password
+    const emailError = validateEmail(email);
+    if (emailError) throw new Error(emailError);
+
+    const passwordError = validatePassword(password);
+    if (passwordError) throw new Error(passwordError);
+
     // Check if the user already exists to provide a friendly error message
     const [existingUser] = await sql`SELECT id, email_verified FROM users WHERE email = ${email}`;
     

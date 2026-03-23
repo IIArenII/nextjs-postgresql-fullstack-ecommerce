@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { formatCurrencyUSD } from "@/lib/format";
+import { FavoriteButton } from "./FavoriteButton";
 
 export function ProductCard({
   product,
@@ -13,6 +14,8 @@ export function ProductCard({
     category: string;
     stock_num?: number;
     discount_percent?: number;
+    is_favorited?: boolean;
+    image_url?: string;
   };
 }) {
   const originalPrice = Number(product.price);
@@ -28,6 +31,22 @@ export function ProductCard({
           {discountPercent}% OFF
         </div>
       )}
+      <Link href={`/products/${product.id}`} className="block relative aspect-square overflow-hidden bg-slate-100 dark:bg-slate-900">
+        {product.image_url ? (
+          <img
+            src={product.image_url}
+            alt={product.name}
+            className="h-full w-full object-contain transition duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-slate-300 dark:text-slate-700">
+            <svg className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+        )}
+        <div className="absolute inset-0 bg-black/0 transition duration-500 group-hover:bg-black/5" />
+      </Link>
       <div className="p-5">
         <div className="flex items-start justify-between gap-3">
           <Link
@@ -36,9 +55,9 @@ export function ProductCard({
           >
             {product.name}
           </Link>
-          <span className="inline-flex shrink-0 items-center rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-300">
-            {product.category}
-          </span>
+          <div className="shrink-0 -mr-2">
+            <FavoriteButton productId={product.id} isFavorited={product.is_favorited} />
+          </div>
         </div>
 
         <p className="mt-2 line-clamp-2 text-sm text-slate-600 dark:text-slate-300">

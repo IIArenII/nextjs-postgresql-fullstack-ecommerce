@@ -8,6 +8,7 @@ import { addProduct } from "./actions";
 import { formatCurrencyUSD } from "@/lib/format";
 import { StatusSelect } from "@/components/StatusSelect";
 import { ProductListing } from "@/components/ProductListing";
+import { ProductImageInput } from "@/components/ProductImageInput";
 
 export default async function SellerPage() {
   const session = await getSession();
@@ -23,8 +24,9 @@ export default async function SellerPage() {
     category: string;
     stock_num: number;
     discount_percent: number;
+    image_url: string;
   }[]>`
-    SELECT id, name, description, price, category, stock_num, discount_percent
+    SELECT id, name, description, price, category, stock_num, discount_percent, image_url
     FROM products
     WHERE seller_id = ${session.userId}
     ORDER BY id DESC
@@ -243,6 +245,9 @@ export default async function SellerPage() {
                 ))}
               </select>
             </div>
+            
+            <ProductImageInput />
+            
             <button
               type="submit"
               className="bg-slate-900 text-white p-3 rounded-lg font-bold hover:bg-black transition-all dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"

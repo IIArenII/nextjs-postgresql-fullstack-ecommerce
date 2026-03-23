@@ -190,11 +190,16 @@ export function AccountForm({ user }: { user: any }) {
                 <input
                   name="newPassword"
                   type="password"
+                  minLength={8}
                   className="w-full border p-3 pl-10 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 transition-all"
-                  placeholder="At least 6 characters"
+                  placeholder="At least 8 characters"
                 />
                 <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
               </div>
+              <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
+                At least 8 characters. Use letters, numbers, and symbols (ASCII only). 
+                No accented chars or spaces at edges.
+              </p>
             </div>
           </div>
         </div>

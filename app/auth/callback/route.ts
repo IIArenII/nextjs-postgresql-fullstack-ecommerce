@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 const secret = new TextEncoder().encode(
-  process.env.JWT_SECRET || "your-secret-key-change-me",
+  process.env.JWT_SECRET,
 );
 
 export async function GET(request: NextRequest) {
