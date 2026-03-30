@@ -2,22 +2,21 @@
 
 import { useState } from "react";
 import { updateAccount, changeRole } from "@/app/account/actions";
-import { User, Lock, Mail, CheckCircle2, AlertCircle, ShieldCheck, ArrowLeftRight } from "lucide-react";
+import { User, Lock, Mail, ShieldCheck, ArrowLeftRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export function AccountForm({ user }: { user: any }) {
   const [isPending, setIsPending] = useState(false);
   const [roleChangePending, setRoleChangePending] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const router = useRouter();
 
   async function handleSubmit(formData: FormData) {
     setIsPending(true);
-    setMessage(null);
     try {
       const result = await updateAccount(formData);
       if (result.success) {
-        setMessage({ type: 'success', text: 'Account settings updated successfully!' });
+        toast.success('Account settings updated successfully!');
         // Clear password fields
         const form = document.getElementById('account-form') as HTMLFormElement;
         if (form) {
@@ -26,7 +25,7 @@ export function AccountForm({ user }: { user: any }) {
         }
       }
     } catch (e: any) {
-      setMessage({ type: 'error', text: e.message });
+      toast.error(e.message);
     } finally {
       setIsPending(false);
     }
@@ -34,16 +33,6 @@ export function AccountForm({ user }: { user: any }) {
 
   return (
     <div className="space-y-6">
-      {message && (
-        <div className={`p-4 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300 ${
-          message.type === 'success' 
-            ? 'bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-950/30 dark:border-emerald-900 dark:text-emerald-400' 
-            : 'bg-red-50 text-red-700 border border-red-100 dark:bg-red-950/30 dark:border-red-900 dark:text-red-400'
-        }`}>
-          {message.type === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
-          <p className="text-sm font-medium">{message.text}</p>
-        </div>
-      )}
 
       <form id="account-form" action={handleSubmit} className="space-y-8">
         {/* Profile Section */}
@@ -133,15 +122,15 @@ export function AccountForm({ user }: { user: any }) {
             disabled={roleChangePending}
             onClick={async () => {
               const newRole = user.role === 'Buyer' ? 'Seller' : 'Buyer';
-              if (!confirm(`Are you sure you want to switch to ${newRole}?`)) return;
               setRoleChangePending(true);
-              setMessage(null);
               try {
                 await changeRole(newRole);
-                setMessage({ type: 'success', text: `Role changed to ${newRole}! Refreshing...` });
+                toast.success(`Role changed to ${newRole}! Refreshing...`, {
+                    duration: 3000,
+                });
                 setTimeout(() => router.refresh(), 1000);
               } catch (e: any) {
-                setMessage({ type: 'error', text: e.message });
+                toast.error(e.message);
               } finally {
                 setRoleChangePending(false);
               }

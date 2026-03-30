@@ -2,11 +2,10 @@
 import { useState, useEffect } from "react";
 import { handleAuth, verifyEmailCode } from "@/app/auth/actions";
 import { X } from "lucide-react";
+import { toast } from "sonner";
 
 export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onClose: () => void, onSuccess: () => void }) {
   const [isLogin, setIsLogin] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [verificationSent, setVerificationSent] = useState(false);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -22,7 +21,6 @@ export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
   if (!isOpen) return null;
 
   async function clientAction(formData: FormData) {
-    setError(null);
     setVerificationSent(false);
     setIsPending(true);
     try {
@@ -45,9 +43,9 @@ export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
       }
     } catch (e: unknown) {
       if (e instanceof Error) {
-        setError(e.message);
+        toast.error(e.message);
       } else {
-        setError("An unexpected error occurred");
+        toast.error("An unexpected error occurred");
       }
     } finally {
       setIsPending(false);
@@ -55,21 +53,19 @@ export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
   }
 
   async function handleVerifySubmit(formData: FormData) {
-    setError(null);
-    setSuccessMsg(null);
     setIsVerifying(true);
     const code = formData.get("code") as string;
     try {
       if (!pendingEmail) throw new Error("Missing email address.");
       await verifyEmailCode(pendingEmail, code);
-      setSuccessMsg("Your email has been successfully verified! You can now log in.");
+      toast.success("Your email has been successfully verified! You can now log in.");
       setVerificationSent(false);
       setIsLogin(true);
     } catch (e: unknown) {
       if (e instanceof Error) {
-        setError(e.message);
+        toast.error(e.message);
       } else {
-        setError("Invalid code");
+        toast.error("Invalid code");
       }
     } finally {
       setIsVerifying(false);
@@ -94,18 +90,6 @@ export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
             You need to be logged in to purchase items.
           </p>
-
-          {successMsg && (
-            <div className="mb-4 p-3 bg-green-50 text-green-700 text-sm rounded-lg border border-green-200 dark:bg-green-900/30 dark:border-green-800/50 dark:text-green-300">
-              {successMsg}
-            </div>
-          )}
-
-          {error && (
-            <div className="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100 dark:bg-red-950/30 dark:border-red-900/50 dark:text-red-400">
-              {error}
-            </div>
-          )}
 
           {verificationSent ? (
             <div className="mb-6 p-4 bg-blue-50 text-blue-800 text-sm rounded-lg border border-blue-200 dark:bg-blue-900/30 dark:border-blue-800/50 dark:text-blue-200 flex flex-col gap-2">
@@ -175,7 +159,6 @@ export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
             <button
               onClick={() => {
                 setIsLogin(!isLogin);
-                setError(null);
                 setVerificationSent(false);
               }}
               className="text-sm font-medium text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors"

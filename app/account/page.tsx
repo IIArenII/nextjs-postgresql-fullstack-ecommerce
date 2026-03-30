@@ -1,8 +1,18 @@
+import { Metadata } from "next";
 import { getSession } from "@/lib/auth";
 import { sql } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { AccountForm } from "@/components/AccountForm";
+
+export const metadata: Metadata = {
+  title: "Account Settings",
+  description: "Manage your personal information and preferences.",
+  robots: {
+    index: false,
+    follow: true,
+  },
+};
 
 export default async function AccountPage() {
   const session = await getSession();

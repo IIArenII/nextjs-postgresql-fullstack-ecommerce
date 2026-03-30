@@ -1,8 +1,29 @@
+import { Metadata } from "next";
 import Link from "next/link";
 import { sql } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { AppShell } from "@/components/AppShell";
 import { ProductCard } from "@/components/ProductCard";
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}): Promise<Metadata> {
+  const { q } = await searchParams;
+  
+  if (q) {
+    return {
+      title: `Search results for "${q}"`,
+      description: `Browse all products matching "${q}" at Storefront.`,
+    };
+  }
+
+  return {
+    title: "All Products",
+    description: "Explore our full range of premium lifestyle essentials.",
+  };
+}
 
 type Product = {
   id: number;

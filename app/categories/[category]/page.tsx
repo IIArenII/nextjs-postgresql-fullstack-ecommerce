@@ -1,9 +1,32 @@
+import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { sql } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { AppShell } from "@/components/AppShell";
 import { ProductCard } from "@/components/ProductCard";
+import { ShoppingBag } from "lucide-react";
+import { CATEGORY_IMAGES } from "@/lib/constants";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ category: string }>;
+}): Promise<Metadata> {
+  const { category } = await params;
+  const decodedCategory = decodeURIComponent(category);
+  const imageUrl = CATEGORY_IMAGES[decodedCategory] || CATEGORY_IMAGES["Other"];
+
+  return {
+    title: decodedCategory,
+    description: `Shop the best ${decodedCategory} collection at Storefront. Premium products curated for you.`,
+    openGraph: {
+      title: `${decodedCategory} Collection`,
+      description: `Explore our premium range of ${decodedCategory}.`,
+      images: imageUrl ? [imageUrl] : [],
+    },
+  };
+}
 
 type Product = {
   id: number;
@@ -78,8 +101,22 @@ export default async function CategoryPage({
       }
     >
       {products.length === 0 ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200">
-          No products found in this category.
+        <div className="flex flex-col items-center justify-center rounded-3xl border border-slate-200 bg-white p-16 text-center shadow-sm dark:border-slate-800 dark:bg-slate-950">
+          <div className="mb-6 rounded-full bg-slate-50 p-4 dark:bg-slate-900">
+            <ShoppingBag className="h-10 w-10 text-slate-300 dark:text-slate-700" />
+          </div>
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            Nothing here yet
+          </h2>
+          <p className="mt-2 max-w-sm text-sm text-slate-500 dark:text-slate-400">
+            We haven&apos;t added any products to the <strong>{decodedCategory}</strong> collection just yet. Check back soon for new arrivals!
+          </p>
+          <Link
+            href="/products"
+            className="mt-8 rounded-full bg-blue-600 px-6 py-2.5 text-xs font-bold text-white shadow-lg transition hover:bg-blue-700 hover:-translate-y-0.5"
+          >
+            EXPLORE ALL PRODUCTS
+          </Link>
         </div>
       ) : (
         <>

@@ -4,6 +4,14 @@ import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { ProductCard } from "@/components/ProductCard";
 import { ArrowRight, MoveRight, ShoppingBag } from "lucide-react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Storefront | Premium Lifestyle Essentials",
+  description: "Explore our curated collection of high-quality essentials designed to improve your daily life. Simple, functional, and built to last.",
+};
+
+import { PRODUCT_CATEGORIES, CATEGORY_IMAGES } from "@/lib/constants";
 
 interface Product {
   id: number;
@@ -17,13 +25,21 @@ interface Product {
 }
 
 export default async function Home() {
-  const categoryRows = await sql<{ category: string; count: number }[]>`
+  const rows = await sql<{ category: string; count: number }[]>`
     SELECT category, COUNT(*)::int AS count
     FROM products
     GROUP BY category
-    ORDER BY count DESC, category ASC
-    LIMIT 4
   `;
+
+  // Merge with all categories to ensure we show at least 4 items, sorted by popularity
+  const featuredCategories = PRODUCT_CATEGORIES.map(catName => {
+    const dbRow = rows.find(r => r.category === catName);
+    return {
+      category: catName,
+      count: dbRow ? dbRow.count : 0
+    };
+  }).sort((a, b) => b.count - a.count || a.category.localeCompare(b.category))
+    .slice(0, 4);
 
   const session = await getSession();
   const userId = session?.userId ?? '00000000-0000-0000-0000-000000000000';
@@ -35,17 +51,6 @@ export default async function Home() {
     ORDER BY id DESC
     LIMIT 6
   `;
-
-  const categoryImages: Record<string, string> = {
-    "Books": "/images/cat_books.webp",
-    "Electronics": "/images/electronics_minimalist",
-    "Home & Garden": "/images/cat_home.webp",
-    "Home & Living": "/images/cat_home.webp",
-    "Clothing & Apparel": "/images/cat_fashion.webp",
-    "Fashion": "/images/cat_fashion.webp",
-    "Sports & Outdoors": "/images/sports_minimalist",
-    "Other": "/images/elevate_minimalits"
-  };
 
   return (
     <AppShell 
@@ -111,14 +116,14 @@ export default async function Home() {
         </div>
 
         <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4">
-          {categoryRows.map((row) => (
+          {featuredCategories.map((row) => (
             <Link
               key={row.category}
               href={`/categories/${encodeURIComponent(row.category)}`}
               className="group relative aspect-[3/4] overflow-hidden rounded-2xl sm:rounded-3xl bg-slate-200 dark:bg-slate-800 transition shadow-sm hover:shadow-xl hover:-translate-y-1"
             >
               <img 
-                src={categoryImages[row.category] || categoryImages["Other"]} 
+                src={CATEGORY_IMAGES[row.category] || CATEGORY_IMAGES["Other"]} 
                 alt={row.category} 
                 className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
               />
@@ -126,7 +131,7 @@ export default async function Home() {
               <div className="absolute bottom-0 left-0 p-4 sm:p-6 text-white transform transition duration-500 group-hover:translate-y-[-4px]">
                 <h3 className="text-sm sm:text-xl font-bold tracking-tight">{row.category}</h3>
                 <p className="mt-0.5 sm:mt-1 text-[8px] sm:text-[10px] uppercase font-bold tracking-widest text-slate-300 group-hover:text-white transition-colors">
-                  {row.count} PRODUCTS
+                  {row.count} PRODUCTS {row.count === 0 && "(COMING SOON)"}
                 </p>
               </div>
             </Link>

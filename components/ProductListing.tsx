@@ -5,6 +5,7 @@ import { ProductCard } from "./ProductCard";
 import { updateStock, updateProduct } from "@/app/seller/actions";
 import { Edit2, X, Check } from "lucide-react";
 import { ProductImageInput } from "./ProductImageInput";
+import { toast } from "sonner";
 
 export function ProductListing({ 
   product, 
@@ -35,8 +36,9 @@ export function ProductListing({
             try {
               await updateProduct(formData);
               setIsEditing(false);
+              toast.success("Product updated successfully!");
             } catch (e: any) {
-              alert(e.message);
+              toast.error(e.message);
             } finally {
               setIsPending(false);
             }
@@ -125,7 +127,17 @@ export function ProductListing({
       {/* Quick Stock Edit */}
       <div className="mt-2 text-sm text-slate-500 flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200 shadow-sm dark:bg-slate-900 dark:border-slate-800">
         <span className="font-semibold text-xs ml-1">Stock:</span>
-        <form action={updateStock} className="flex gap-2">
+        <form 
+          action={async (formData) => {
+            try {
+              await updateStock(formData);
+              toast.success("Stock updated successfully!");
+            } catch (e: any) {
+              toast.error(e.message);
+            }
+          }} 
+          className="flex gap-2"
+        >
           <input type="hidden" name="productId" value={product.id} />
           <input 
             type="number" 

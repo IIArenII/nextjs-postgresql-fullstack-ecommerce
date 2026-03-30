@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { sql } from "@/lib/db";
@@ -8,6 +9,46 @@ import { Tag } from "lucide-react";
 import { ProductPurchaseSection } from "@/components/ProductPurchaseSection";
 import { getSession } from "@/lib/auth";
 import { FavoriteButton } from "@/components/FavoriteButton";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const productId = Number(id);
+  if (!Number.isInteger(productId)) return { title: "Product Not Found" };
+
+  const products = await sql<{ name: string; description: string; image_url?: string }[]>`
+    SELECT name, description, image_url
+    FROM products
+    WHERE id = ${productId}
+    LIMIT 1
+  `;
+  const product = products[0];
+
+  if (!product) return { title: "Product Not Found" };
+
+  const description = product.description.length > 160 
+    ? product.description.substring(0, 157) + "..." 
+    : product.description;
+
+  return {
+    title: product.name,
+    description: description,
+    openGraph: {
+      title: product.name,
+      description: description,
+      images: product.image_url ? [product.image_url] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description: description,
+      images: product.image_url ? [product.image_url] : [],
+    },
+  };
+}
 
 type Product = {
   id: number;
