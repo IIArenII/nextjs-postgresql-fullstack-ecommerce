@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next'
 import { sql } from '@/lib/db'
 import { PRODUCT_CATEGORIES } from '@/lib/constants'
 
-const BASE_URL = 'https://storefront-ecommerce.vercel.app'
+const BASE_URL = 'https://storefront.com'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Fetch all product IDs

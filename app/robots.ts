@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/api/', '/account/', '/seller/', '/bag/', '/favorites/', '/orders/'],
     },
-    sitemap: 'https://storefront-ecommerce.vercel.app/sitemap.xml',
+    sitemap: 'https://storefront.com/sitemap.xml',
   }
 }

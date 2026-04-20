@@ -5,6 +5,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import { getSession } from "@/lib/auth";
 import { BagButton } from "./BagButton";
 import { SearchInput } from "./SearchInput";
+import { ClientAnimationWrapper } from "./ClientAnimationWrapper";
 
 export async function AppShell({
   children,
@@ -138,12 +139,14 @@ export async function AppShell({
       )}
 
       <main className={`mx-auto max-w-6xl px-4 pb-16 sm:px-6 ${!(title || subtitle) ? 'pt-4' : 'pt-8'}`}>
-        {children}
+        <ClientAnimationWrapper>
+          {children}
+        </ClientAnimationWrapper>
       </main>
 
       <footer className="border-t border-slate-200/70 bg-white/60 py-10 text-sm text-slate-500 dark:border-slate-800/70 dark:bg-slate-950/50 dark:text-slate-400">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p>Storefront demo with Next.js + Postgres.</p>
+          <p>&copy; {new Date().getFullYear()} Storefront. All rights reserved.</p>
           <div className="flex gap-4">
             <Link href="/categories" className="hover:text-slate-900 dark:hover:text-white">
               Browse categories

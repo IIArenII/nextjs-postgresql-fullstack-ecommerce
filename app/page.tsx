@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 };
 
 import { PRODUCT_CATEGORIES, CATEGORY_IMAGES } from "@/lib/constants";
+import { MotionSection, MotionDiv } from "@/components/MotionComponents";
 
 interface Product {
   id: number;
@@ -58,7 +59,7 @@ export default async function Home() {
       subtitle={null}
     >
       {/* Hero Section */}
-      <section className="relative mb-20 overflow-hidden rounded-[1.5rem] sm:rounded-[2.5rem] bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+      <MotionSection className="relative mb-20 overflow-hidden rounded-[1.5rem] sm:rounded-[2.5rem] bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
         <div className="absolute inset-0 z-0">
           <img 
             src="/images/elevate_minimalits" 
@@ -69,17 +70,23 @@ export default async function Home() {
         </div>
 
         <div className="relative z-10 flex flex-col items-start justify-center px-6 py-16 sm:px-16 sm:py-32 lg:max-w-3xl">
-          <span className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">
-            ESTABLISHED 2026
-          </span>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-5xl lg:text-7xl leading-[1.1]">
-            Essentials for <br className="hidden sm:block" />
-            your lifestyle.
-          </h1>
-          <p className="mt-6 text-sm sm:text-lg leading-relaxed text-slate-600 dark:text-slate-300 max-w-sm sm:max-w-md">
-            A carefully selected collection of products designed to improve your daily life. Simple, functional, and built to last.
-          </p>
-          <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
+          <MotionDiv delay={0.1}>
+            <span className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">
+              ESTABLISHED 2026
+            </span>
+          </MotionDiv>
+          <MotionDiv delay={0.2}>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-5xl lg:text-7xl leading-[1.1]">
+              Essentials for <br className="hidden sm:block" />
+              your lifestyle.
+            </h1>
+          </MotionDiv>
+          <MotionDiv delay={0.3}>
+            <p className="mt-6 text-sm sm:text-lg leading-relaxed text-slate-600 dark:text-slate-300 max-w-sm sm:max-w-md">
+              A carefully selected collection of products designed to improve your daily life. Simple, functional, and built to last.
+            </p>
+          </MotionDiv>
+          <MotionDiv delay={0.4} className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
             <Link
               href="/products"
               className="w-full sm:w-auto text-center rounded-full bg-blue-600 px-8 py-3.5 text-xs sm:text-sm font-bold text-white shadow-lg transition hover:bg-blue-700 hover:-translate-y-0.5 active:translate-y-0"
@@ -92,12 +99,12 @@ export default async function Home() {
             >
               EXPLORE ALL <MoveRight className="h-4 w-4 transition group-hover:translate-x-1" />
             </Link>
-          </div>
+          </MotionDiv>
         </div>
-      </section>
+      </MotionSection>
 
       {/* Directory Section */}
-      <section className="mb-24">
+      <MotionSection className="mb-24">
         <div className="mb-8 flex items-end justify-between px-2 sm:px-0">
           <div>
             <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500 mb-2 block">
@@ -116,31 +123,35 @@ export default async function Home() {
         </div>
 
         <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4">
-          {featuredCategories.map((row) => (
-            <Link
+          {featuredCategories.map((row, i) => (
+            <MotionDiv
               key={row.category}
-              href={`/categories/${encodeURIComponent(row.category)}`}
-              className="group relative aspect-[3/4] overflow-hidden rounded-2xl sm:rounded-3xl bg-slate-200 dark:bg-slate-800 transition shadow-sm hover:shadow-xl hover:-translate-y-1"
+              delay={i * 0.1}
             >
-              <img 
-                src={CATEGORY_IMAGES[row.category] || CATEGORY_IMAGES["Other"]} 
-                alt={row.category} 
-                className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute bottom-0 left-0 p-4 sm:p-6 text-white transform transition duration-500 group-hover:translate-y-[-4px]">
-                <h3 className="text-sm sm:text-xl font-bold tracking-tight">{row.category}</h3>
-                <p className="mt-0.5 sm:mt-1 text-[8px] sm:text-[10px] uppercase font-bold tracking-widest text-slate-300 group-hover:text-white transition-colors">
-                  {row.count} PRODUCTS {row.count === 0 && "(COMING SOON)"}
-                </p>
-              </div>
-            </Link>
+              <Link
+                href={`/categories/${encodeURIComponent(row.category)}`}
+                className="group relative block aspect-[3/4] overflow-hidden rounded-2xl sm:rounded-3xl bg-slate-200 dark:bg-slate-800 transition shadow-sm hover:shadow-xl hover:-translate-y-1"
+              >
+                <img 
+                  src={CATEGORY_IMAGES[row.category] || CATEGORY_IMAGES["Other"]} 
+                  alt={row.category} 
+                  className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
+                <div className="absolute bottom-0 left-0 p-4 sm:p-6 text-white transform transition duration-500 group-hover:translate-y-[-4px]">
+                  <h3 className="text-sm sm:text-xl font-bold tracking-tight">{row.category}</h3>
+                  <p className="mt-0.5 sm:mt-1 text-[8px] sm:text-[10px] uppercase font-bold tracking-widest text-slate-300 group-hover:text-white transition-colors">
+                    {row.count} PRODUCTS {row.count === 0 && "(COMING SOON)"}
+                  </p>
+                </div>
+              </Link>
+            </MotionDiv>
           ))}
         </div>
-      </section>
+      </MotionSection>
 
       {/* Latest Products Section */}
-      <section>
+      <MotionSection>
         <div className="mb-10 flex items-end justify-between">
           <div>
             <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500 mb-2 block">
@@ -159,11 +170,11 @@ export default async function Home() {
         </div>
 
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {latestProducts.map((p) => (
+          {latestProducts.map((p, i) => (
             <ProductCard key={p.id} product={p} />
           ))}
         </div>
-      </section>
+      </MotionSection>
     </AppShell>
   );
 }

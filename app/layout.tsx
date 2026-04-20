@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { CartProvider } from "@/lib/cart-context";
+import { DemoDisclaimer } from "@/components/DemoDisclaimer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,18 +16,19 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://storefront.com"),
   title: {
     default: "Storefront | Premium Lifestyle Essentials",
     template: "%s | Storefront",
   },
-  description: "A carefully selected collection of premium lifestyle products designed for functionality and longevity.",
-  keywords: ["ecommerce", "premium", "lifestyle", "essentials", "minimalist", "quality"],
+  description: "Discover a carefully selected collection of premium lifestyle products designed for functionality and longevity at Storefront.",
+  keywords: ["ecommerce", "premium", "lifestyle", "essentials", "minimalist", "quality", "storefront"],
   authors: [{ name: "Storefront Team" }],
   creator: "Storefront",
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://storefront-ecommerce.vercel.app",
+    url: "https://storefront.com",
     siteName: "Storefront",
     title: "Storefront | Premium Lifestyle Essentials",
     description: "Curated collection of high-quality essentials for your lifestyle.",
@@ -48,6 +50,16 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "google-site-verification-id", // Placeholder
   },
 };
 
@@ -78,6 +90,39 @@ export default function RootLayout({
       >
         <CartProvider>
           {children}
+          <DemoDisclaimer />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                "name": "Storefront",
+                "url": "https://storefront.com",
+                "logo": "https://storefront.com/favicon.ico",
+                "sameAs": [
+                  "https://twitter.com/storefront",
+                  "https://instagram.com/storefront"
+                ]
+              }),
+            }}
+          />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                "name": "Storefront",
+                "url": "https://storefront.com",
+                "potentialAction": {
+                  "@type": "SearchAction",
+                  "target": "https://storefront.com/products?q={search_term_string}",
+                  "query-input": "required name=search_term_string"
+                }
+              }),
+            }}
+          />
         </CartProvider>
         <Toaster position="top-right" richColors />
       </body>

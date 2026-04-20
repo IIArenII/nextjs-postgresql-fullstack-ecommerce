@@ -8,6 +8,7 @@ import { useState } from "react";
 import { checkoutCart } from "@/app/orders/actions";
 import { useRouter } from "next/navigation";
 import { AuthModal } from "@/components/AuthModal";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function BagClient() {
   const { items, removeFromCart, updateQuantity, totalPrice, itemCount, clearCart } = useCart();
@@ -109,52 +110,58 @@ export function BagClient() {
       ) : (
         <div className="grid gap-10 lg:grid-cols-3">
           <div className="lg:col-span-2 space-y-4">
-            {items.map((item) => (
-              <div 
-                key={item.id} 
-                className="flex flex-col sm:flex-row items-center gap-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md dark:border-slate-800 dark:bg-slate-950"
-              >
-                <div className="h-24 w-24 flex-shrink-0 bg-slate-100 dark:bg-slate-900 rounded-xl flex items-center justify-center text-xs text-slate-400 font-medium overflow-hidden border border-slate-100 dark:border-slate-800">
-                  No image
-                </div>
-                <div className="flex-grow text-center sm:text-left">
-                  <Link href={`/products/${item.id}`} className="text-lg font-bold text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                    {item.name}
-                  </Link>
-                  <p className="mt-1 text-sm font-semibold text-slate-500 dark:text-slate-400">
-                    {formatCurrencyUSD(item.price)}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
+            <AnimatePresence initial={false}>
+              {items.map((item) => (
+                <motion.div 
+                  key={item.id} 
+                  layout
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  className="flex flex-col sm:flex-row items-center gap-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-md dark:border-slate-800 dark:bg-slate-950"
+                >
+                  <div className="h-24 w-24 flex-shrink-0 bg-slate-100 dark:bg-slate-900 rounded-xl flex items-center justify-center text-xs text-slate-400 font-medium overflow-hidden border border-slate-100 dark:border-slate-800">
+                    No image
+                  </div>
+                  <div className="flex-grow text-center sm:text-left">
+                    <Link href={`/products/${item.id}`} className="text-lg font-bold text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                      {item.name}
+                    </Link>
+                    <p className="mt-1 text-sm font-semibold text-slate-500 dark:text-slate-400">
+                      {formatCurrencyUSD(item.price)}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
+                      <button
+                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        aria-label="Decrease quantity"
+                      >
+                        <Minus className="h-3 w-3" />
+                      </button>
+                      <span className="w-8 text-center text-sm font-bold text-slate-900 dark:text-white">
+                        {item.quantity}
+                      </span>
+                      <button
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        aria-label="Increase quantity"
+                      >
+                        <Plus className="h-3 w-3" />
+                      </button>
+                    </div>
                     <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                      aria-label="Decrease quantity"
+                      onClick={() => removeFromCart(item.id)}
+                      className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                      aria-label="Remove item"
                     >
-                      <Minus className="h-3 w-3" />
-                    </button>
-                    <span className="w-8 text-center text-sm font-bold text-slate-900 dark:text-white">
-                      {item.quantity}
-                    </span>
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                      aria-label="Increase quantity"
-                    >
-                      <Plus className="h-3 w-3" />
+                      <Trash2 className="h-5 w-5" />
                     </button>
                   </div>
-                  <button
-                    onClick={() => removeFromCart(item.id)}
-                    className="p-2 text-slate-400 hover:text-red-500 transition-colors"
-                    aria-label="Remove item"
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
-            ))}
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
 
           <div className="space-y-6">

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ShoppingBag } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function BagButton() {
   const { itemCount } = useCart();
@@ -30,11 +31,19 @@ export function BagButton() {
     >
       <div className="relative">
         <ShoppingBag className="h-5 w-5" />
-        {itemCount > 0 && (
-          <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white group-hover:bg-blue-700">
-            {itemCount}
-          </span>
-        )}
+        <AnimatePresence>
+          {itemCount > 0 && (
+            <motion.span 
+              key="counter"
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.5, opacity: 0 }}
+              className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white group-hover:bg-blue-700"
+            >
+              {itemCount}
+            </motion.span>
+          )}
+        </AnimatePresence>
       </div>
       <span className="hidden sm:inline">Bag</span>
     </Link>

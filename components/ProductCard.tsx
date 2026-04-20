@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { formatCurrencyUSD } from "@/lib/format";
 import { FavoriteButton } from "./FavoriteButton";
+import { motion } from "framer-motion";
 
 export function ProductCard({
   product,
@@ -25,7 +28,14 @@ export function ProductCard({
     : originalPrice;
 
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-800 dark:bg-slate-950">
+    <motion.div 
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      whileHover={{ y: -5, transition: { duration: 0.2 } }}
+      className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-xl dark:border-slate-800 dark:bg-slate-950"
+    >
       {discountPercent > 0 && (
         <div className="absolute top-3 left-3 z-10 rounded-lg bg-red-600 px-2 py-1 text-[10px] font-bold text-white shadow-sm">
           {discountPercent}% OFF
@@ -100,6 +110,6 @@ export function ProductCard({
       </div>
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-blue-500/8 to-transparent opacity-0 transition group-hover:opacity-100 dark:from-blue-400/10" />
-    </div>
+    </motion.div>
   );
 }

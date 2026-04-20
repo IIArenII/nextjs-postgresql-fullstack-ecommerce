@@ -4,6 +4,7 @@ import { sql } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { AppShell } from "@/components/AppShell";
 import { ProductCard } from "@/components/ProductCard";
+import { MotionSection } from "@/components/MotionComponents";
 
 export async function generateMetadata({
   searchParams,
@@ -130,7 +131,7 @@ export default async function ProductsPage({
         <>
           <div className="space-y-12">
             {grouped.map(([category, items]) => (
-              <section key={category} className="scroll-mt-24">
+              <MotionSection key={category} className="scroll-mt-24">
                 <div className="mb-5 flex items-end justify-between gap-3">
                   <div>
                     <h2 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
@@ -154,7 +155,7 @@ export default async function ProductsPage({
                     <ProductCard key={p.id} product={p} />
                   ))}
                 </div>
-              </section>
+              </MotionSection>
             ))}
           </div>
 
