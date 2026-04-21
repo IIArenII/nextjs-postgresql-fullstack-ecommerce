@@ -52,7 +52,7 @@ export default async function Home() {
     FROM products
     WHERE status = 'approved'
     ORDER BY id DESC
-    LIMIT 6
+    LIMIT 8
   `;
 
   return (
@@ -61,47 +61,57 @@ export default async function Home() {
       subtitle={null}
     >
       {/* Hero Section */}
-      <MotionSection className="relative mb-20 overflow-hidden rounded-[1.5rem] sm:rounded-[2.5rem] bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="/images/elevate_minimalits" 
-            alt="Hero background" 
-            className="h-full w-full object-cover opacity-60 dark:opacity-20"
-          />
-          <div className="absolute inset-0 bg-linear-to-r from-slate-50 via-slate-50/70 to-transparent dark:from-slate-900 dark:via-slate-900/70" />
-        </div>
+      <MotionSection className="relative mb-20 overflow-hidden rounded-[1.5rem] sm:rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div className="flex flex-col lg:flex-row items-center gap-8 px-8 py-12 sm:px-14 sm:py-16">
+          
+          {/* Left: Text Content — always visible */}
+          <div className="flex-1 flex flex-col items-start w-full">
+            <MotionDiv delay={0.1}>
+              <span className="mb-4 text-[10px] font-bold uppercase tracking-[0.25em] text-blue-600 dark:text-blue-400 block">
+                The Digital Atelier
+              </span>
+            </MotionDiv>
+            <MotionDiv delay={0.2}>
+              <h1 className="text-4xl sm:text-5xl font-black tracking-tight leading-[1.05]">
+                <span className="text-slate-900 dark:text-white">Empowering<br />Your<br /></span>
+                <span className="text-blue-600">Commercial<br />Journey</span>
+              </h1>
+            </MotionDiv>
+            <MotionDiv delay={0.3}>
+              <p className="mt-6 text-sm sm:text-base leading-relaxed text-slate-500 dark:text-slate-400 max-w-xs">
+                Seamless experiences for buyers, sellers, and moderators. A curated ecosystem where every transaction feels bespoke.
+              </p>
+            </MotionDiv>
+            <MotionDiv delay={0.4} className="mt-8 flex items-center gap-6">
+              <Link
+                href="/products"
+                className="rounded-full bg-blue-600 px-7 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 active:scale-[0.98]"
+              >
+                Explore Marketplace
+              </Link>
+              <Link
+                href="/seller"
+                className="group flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+              >
+                Start Selling <MoveRight className="h-4 w-4 transition group-hover:translate-x-1" />
+              </Link>
+            </MotionDiv>
+          </div>
 
-        <div className="relative z-10 flex flex-col items-start justify-center px-6 py-16 sm:px-16 sm:py-32 lg:max-w-3xl">
-          <MotionDiv delay={0.1}>
-            <span className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">
-              ESTABLISHED 2026
-            </span>
+          {/* Right: Image — hidden on tablet (md), shown on mobile (below text) and desktop (side by side) */}
+          <MotionDiv
+            delay={0.3}
+            className="w-full lg:flex-1 lg:max-w-sm xl:max-w-md md:hidden lg:block"
+          >
+            <div className="overflow-hidden rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800">
+              <img
+                src="/images/e-commerce-main-page-img.png"
+                alt="Modern workspace setup"
+                className="w-full h-full object-cover"
+              />
+            </div>
           </MotionDiv>
-          <MotionDiv delay={0.2}>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-5xl lg:text-7xl leading-[1.1]">
-              Essentials for <br className="hidden sm:block" />
-              your lifestyle.
-            </h1>
-          </MotionDiv>
-          <MotionDiv delay={0.3}>
-            <p className="mt-6 text-sm sm:text-lg leading-relaxed text-slate-600 dark:text-slate-300 max-w-sm sm:max-w-md">
-              A carefully selected collection of products designed to improve your daily life. Simple, functional, and built to last.
-            </p>
-          </MotionDiv>
-          <MotionDiv delay={0.4} className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
-            <Link
-              href="/products"
-              className="w-full sm:w-auto text-center rounded-full bg-blue-600 px-8 py-3.5 text-xs sm:text-sm font-bold text-white shadow-lg transition hover:bg-blue-700 hover:-translate-y-0.5 active:translate-y-0"
-            >
-              SHOP NOW
-            </Link>
-            <Link
-              href="/categories"
-              className="group flex items-center gap-2 text-xs sm:text-sm font-bold tracking-wider text-slate-900 dark:text-white pl-2 sm:pl-0"
-            >
-              EXPLORE ALL <MoveRight className="h-4 w-4 transition group-hover:translate-x-1" />
-            </Link>
-          </MotionDiv>
+
         </div>
       </MotionSection>
 
@@ -124,7 +134,7 @@ export default async function Home() {
           </Link>
         </div>
 
-        <div className="grid gap-4 sm:gap-6 grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:gap-5 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {featuredCategories.map((row, i) => (
             <MotionDiv
               key={row.category}
@@ -132,7 +142,7 @@ export default async function Home() {
             >
               <Link
                 href={`/categories/${encodeURIComponent(row.category)}`}
-                className="group relative block aspect-[3/4] overflow-hidden rounded-2xl sm:rounded-3xl bg-slate-200 dark:bg-slate-800 transition shadow-sm hover:shadow-xl hover:-translate-y-1"
+                className="group relative block aspect-[3/4] md:aspect-[4/3] lg:aspect-square overflow-hidden rounded-2xl bg-slate-200 dark:bg-slate-800 transition shadow-sm hover:shadow-xl hover:-translate-y-1"
               >
                 <img 
                   src={CATEGORY_IMAGES[row.category] || CATEGORY_IMAGES["Other"]} 
@@ -171,9 +181,11 @@ export default async function Home() {
           </Link>
         </div>
 
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {latestProducts.map((p, i) => (
-            <ProductCard key={p.id} product={p} />
+        <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+          {latestProducts.map((p) => (
+            <div key={p.id} className="text-sm">
+              <ProductCard product={p} />
+            </div>
           ))}
         </div>
       </MotionSection>

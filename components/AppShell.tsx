@@ -1,11 +1,13 @@
 import Link from "next/link";
-import { ShoppingBag, Store, Tag, UserCircle, Package, Heart, ShieldAlert } from "lucide-react";
+import { UserCircle } from "lucide-react";
 import { LogoutButton } from "./LogoutButton";
 import { ThemeToggle } from "./ThemeToggle";
 import { getSession } from "@/lib/auth";
 import { BagButton } from "./BagButton";
 import { SearchInput } from "./SearchInput";
 import { ClientAnimationWrapper } from "./ClientAnimationWrapper";
+import { NavLinks } from "./NavLinks";
+import { MobileMenu } from "./MobileMenu";
 
 export async function AppShell({
   children,
@@ -18,118 +20,71 @@ export async function AppShell({
 }) {
   const session = await getSession();
 
+  const navLinks = [
+    { href: "/categories", label: "Categories" },
+    { href: "/products", label: "Products" },
+    { href: "/account/favorites", label: "Favorites" },
+    ...(session?.role === "Admin" ? [{ href: "/admin", label: "Moderation" }] : []),
+    { href: "/seller", label: "Sell" },
+  ];
+
   return (
-    <div className="min-h-screen bg-linear-to-b from-slate-50 to-white text-slate-900 dark:from-slate-950 dark:to-slate-950 dark:text-slate-50">
-      <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-white/75 backdrop-blur dark:border-slate-800/70 dark:bg-slate-950/60">
-        <div className="mx-auto flex max-w-6xl items-center gap-2 px-2 py-3 sm:gap-4 sm:px-6">
-          <Link
-            href="/"
-            aria-label="Storefront Home"
-            className="flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm font-semibold tracking-tight hover:bg-slate-100 dark:hover:bg-slate-900"
-          >
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900">
-              <ShoppingBag className="h-5 w-5" />
-            </span>
-            <span className="hidden lg:inline">
-              Storefront<span className="text-blue-600">.</span>
+    <div className="min-h-screen bg-slate-50/30 text-slate-900 dark:bg-slate-950 dark:text-slate-50">
+      <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-100 dark:bg-slate-950/80 dark:border-slate-800">
+        <div className="mx-auto flex max-w-7xl items-center h-16 sm:h-20 px-4 sm:px-6 lg:px-8">
+
+          {/* Logo */}
+          <Link href="/" className="flex items-center mr-6 lg:mr-10 shrink-0">
+            <span className="text-xl sm:text-2xl font-black tracking-tighter text-slate-900 dark:text-white">
+              Storefront
             </span>
           </Link>
 
-          <nav className="flex items-center gap-0.5 sm:gap-1">
-            {/* Hide Categories on small mobile - users can find it in Products or Footer */}
-            <Link
-              href="/categories"
-              title="Categories"
-              aria-label="Categories"
-              className="hidden sm:inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
-            >
-              <Tag className="h-4 w-4" />
-              <span className="hidden md:inline">Categories</span>
-            </Link>
-            <Link
-              href="/products"
-              title="Products"
-              aria-label="Products"
-              className="inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
-            >
-              <ShoppingBag className="h-4 w-4" />
-              <span className="hidden md:inline">Products</span>
-            </Link>
-            {session?.role === "Buyer" && (
-              <Link
-                href="/orders"
-                title="My Orders"
-                aria-label="My Orders"
-                className="inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
-              >
-                <Package className="h-4 w-4" />
-                <span className="hidden md:inline">My Orders</span>
-              </Link>
-            )}
-            {session && (
-              <Link
-                href="/account/favorites"
-                title="Favorites"
-                aria-label="Favorites"
-                className="hidden sm:inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
-              >
-                <Heart className="h-4 w-4" />
-                <span className="hidden md:inline">Favorites</span>
-              </Link>
-            )}
-            {session?.role === "Admin" && (
-              <Link
-                href="/admin"
-                title="Moderation"
-                aria-label="Moderation"
-                className="inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-bold text-blue-600 bg-blue-50/50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/50"
-              >
-                <ShieldAlert className="h-4 w-4" />
-                <span className="hidden md:inline">Moderation</span>
-              </Link>
-            )}
-            {session && (
-              <Link
-                href="/seller"
-                title="Sell"
-                aria-label="Sell"
-                className="inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
-              >
-                <Store className="h-4 w-4" />
-                <span className="hidden md:inline">Sell</span>
-              </Link>
-            )}
+          {/* Desktop Nav (lg+) only */}
+          <nav className="hidden lg:flex items-center gap-8">
+            <NavLinks links={navLinks} />
           </nav>
 
-          <div className="flex-1 flex justify-center">
-            <SearchInput />
-          </div>
+          {/* Right Section */}
+          <div className="ml-auto flex items-center gap-3 sm:gap-4">
+            {/* Search — desktop only */}
+            <div className="hidden lg:block">
+              <SearchInput />
+            </div>
 
-          <div className="ml-auto flex items-center gap-2">
-            {(!session || session.role === "Buyer") && <BagButton />}
             <ThemeToggle />
-            {session ? (
-              <Link
-                href="/account"
-                title="Account Settings"
-                aria-label="Account Settings"
-                className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
-              >
-                <UserCircle className="h-5 w-5 text-blue-600" />
-                <span className="hidden sm:inline">Settings</span>
-              </Link>
-            ) : (
-              <Link
-                href="/auth"
-                title="Sign In"
-                aria-label="Sign In"
-                className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-900 dark:hover:text-white"
-              >
-                <UserCircle className="h-5 w-5" />
-                <span className="hidden sm:inline">Account</span>
-              </Link>
+
+            {/* Account icon */}
+            <Link
+              href={session ? "/account" : "/auth"}
+              className="text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
+              aria-label="Account"
+            >
+              <UserCircle className="h-6 w-6" />
+            </Link>
+
+            {/* Bag — buyers only */}
+            {(!session || session.role === "Buyer") && (
+              <div className="relative">
+                <BagButton />
+              </div>
             )}
-            {session && <LogoutButton />}
+
+            {/* Logout — desktop only */}
+            {session && (
+              <div className="hidden lg:block">
+                <LogoutButton />
+              </div>
+            )}
+
+            {/* Hamburger — everything below desktop (< lg) */}
+            <div className="lg:hidden">
+              <MobileMenu
+                links={navLinks}
+                isLoggedIn={!!session}
+                isBuyer={!session || session.role === "Buyer"}
+              />
+            </div>
           </div>
         </div>
       </header>
@@ -149,7 +104,7 @@ export async function AppShell({
         </div>
       )}
 
-      <main className={`mx-auto max-w-6xl px-4 pb-16 sm:px-6 ${!(title || subtitle) ? 'pt-4' : 'pt-8'}`}>
+      <main className={`mx-auto max-w-6xl px-4 pb-16 sm:px-6 ${!(title || subtitle) ? "pt-4" : "pt-8"}`}>
         <ClientAnimationWrapper>
           {children}
         </ClientAnimationWrapper>
@@ -159,12 +114,8 @@ export async function AppShell({
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p>&copy; {new Date().getFullYear()} Storefront. All rights reserved.</p>
           <div className="flex gap-4">
-            <Link href="/categories" className="hover:text-slate-900 dark:hover:text-white">
-              Browse categories
-            </Link>
-            <Link href="/products" className="hover:text-slate-900 dark:hover:text-white">
-              View all products
-            </Link>
+            <Link href="/categories" className="hover:text-slate-900 dark:hover:text-white">Browse categories</Link>
+            <Link href="/products" className="hover:text-slate-900 dark:hover:text-white">View all products</Link>
           </div>
         </div>
       </footer>
