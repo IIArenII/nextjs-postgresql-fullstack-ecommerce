@@ -66,13 +66,13 @@ export default async function CategoryPage({
     sql<{ count: number }[]>`
       SELECT COUNT(*)::int AS count
       FROM products
-      WHERE category = ${decodedCategory}
+      WHERE category = ${decodedCategory} AND status = 'approved'
     `,
     sql<Product[]>`
       SELECT id, name, description, price, category, stock_num, discount_percent, image_url,
         EXISTS(SELECT 1 FROM favorite_products WHERE product_id = products.id AND user_id = ${userId}::uuid) AS is_favorited
       FROM products
-      WHERE category = ${decodedCategory}
+      WHERE category = ${decodedCategory} AND status = 'approved'
       ORDER BY name ASC
       LIMIT ${PAGE_SIZE} OFFSET ${offset}
     `,

@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { handleAuth, verifyEmailCode } from "./actions";
 import { OAuthButtons } from "@/components/OAuthButtons";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -49,8 +51,10 @@ export default function AuthPage() {
         return;
       }
     } catch (e: unknown) {
-      if (e instanceof Error) {
+      if (e instanceof Error && e.message !== "NEXT_REDIRECT") {
         setError(e.message);
+      } else if (e instanceof Error) {
+        // Redirecting, do nothing
       } else {
         setError("An unexpected error occurred");
       }
@@ -69,9 +73,9 @@ export default function AuthPage() {
       setVerificationSent(false);
       setIsLogin(true);
     } catch (e: unknown) {
-      if (e instanceof Error) {
+      if (e instanceof Error && e.message !== "NEXT_REDIRECT") {
         setError(e.message);
-      } else {
+      } else if (!(e instanceof Error)) {
         setError("Invalid code");
       }
     } finally {
@@ -84,7 +88,15 @@ export default function AuthPage() {
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
-      <div className="p-8 bg-white shadow-xl rounded-2xl w-full max-w-md border dark:bg-slate-900 dark:border-slate-800">
+      <div className="p-8 bg-white shadow-xl rounded-3xl w-full max-w-md border border-slate-100 dark:bg-slate-900 dark:border-slate-800">
+        <Link 
+          href="/" 
+          className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 transition-all mb-8 group bg-slate-50 dark:bg-slate-800/50 px-4 py-2 rounded-full hover:shadow-md"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
+          Back to store
+        </Link>
+
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-slate-100">
           {isLogin ? "Welcome Back" : "Join Our Store"}
         </h2>

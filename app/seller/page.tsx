@@ -30,8 +30,9 @@ export default async function SellerPage() {
     stock_num: number;
     discount_percent: number;
     image_url: string;
+    status: string;
   }[]>`
-    SELECT id, name, description, price, category, stock_num, discount_percent, image_url
+    SELECT id, name, description, price, category, stock_num, discount_percent, image_url, status
     FROM products
     WHERE seller_id = ${session.userId}
     ORDER BY id DESC

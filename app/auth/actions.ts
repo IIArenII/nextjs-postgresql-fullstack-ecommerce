@@ -20,7 +20,7 @@ export async function handleAuth(formData: FormData) {
   const name = formData.get("name") as string;
 
   let userId: string;
-  let role: "Buyer" | "Seller" = "Buyer";
+  let role: "Buyer" | "Seller" | "Admin" = "Buyer";
 
   if (type === "register") {
     // Validate Gmail and Password
@@ -80,7 +80,7 @@ export async function handleAuth(formData: FormData) {
     }
 
     userId = user.id;
-    role = user.role as "Buyer" | "Seller";
+    role = user.role as "Buyer" | "Seller" | "Admin";
   }
 
   // Create JWT Session with the UUID

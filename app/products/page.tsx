@@ -70,9 +70,10 @@ export default async function ProductsPage({
     sql<{ count: number }[]>`
       SELECT COUNT(*)::int AS count
       FROM products
-      WHERE ${
+      WHERE status = 'approved'
+      AND ${
         searchQuery 
-          ? sql`name ILIKE ${searchQuery} OR category ILIKE ${searchQuery} OR description ILIKE ${searchQuery}` 
+          ? sql`(name ILIKE ${searchQuery} OR category ILIKE ${searchQuery} OR description ILIKE ${searchQuery})` 
           : sql`TRUE`
       }
     `,
@@ -80,9 +81,10 @@ export default async function ProductsPage({
       SELECT id, name, description, price, category, stock_num, discount_percent, image_url,
         EXISTS(SELECT 1 FROM favorite_products WHERE product_id = products.id AND user_id = ${userId}::uuid) AS is_favorited
       FROM products
-      WHERE ${
+      WHERE status = 'approved'
+      AND ${
         searchQuery 
-          ? sql`name ILIKE ${searchQuery} OR category ILIKE ${searchQuery} OR description ILIKE ${searchQuery}` 
+          ? sql`(name ILIKE ${searchQuery} OR category ILIKE ${searchQuery} OR description ILIKE ${searchQuery})` 
           : sql`TRUE`
       }
       ORDER BY category ASC, name ASC

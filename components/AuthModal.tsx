@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { handleAuth, verifyEmailCode } from "@/app/auth/actions";
 import { X } from "lucide-react";
 import { toast } from "sonner";
+import { OAuthButtons } from "./OAuthButtons";
 
 export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onClose: () => void, onSuccess: () => void }) {
   const [isLogin, setIsLogin] = useState(true);
@@ -42,8 +43,10 @@ export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
         }
       }
     } catch (e: unknown) {
-      if (e instanceof Error) {
+      if (e instanceof Error && e.message !== "NEXT_REDIRECT") {
         toast.error(e.message);
+      } else if (e instanceof Error) {
+        // e is Error but it's redirect, ignore
       } else {
         toast.error("An unexpected error occurred");
       }
@@ -62,10 +65,10 @@ export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
       setVerificationSent(false);
       setIsLogin(true);
     } catch (e: unknown) {
-      if (e instanceof Error) {
+      if (e instanceof Error && e.message !== "NEXT_REDIRECT") {
         toast.error(e.message);
-      } else {
-        toast.error("Invalid code");
+      } else if (!(e instanceof Error)) {
+        toast.error("An unexpected error occurred");
       }
     } finally {
       setIsVerifying(false);
@@ -154,6 +157,8 @@ export function AuthModal({ isOpen, onClose, onSuccess }: { isOpen: boolean, onC
               </button>
             </form>
           )}
+
+          {!verificationSent && <OAuthButtons />}
 
           <div className="mt-6 text-center">
             <button

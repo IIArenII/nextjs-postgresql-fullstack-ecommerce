@@ -29,6 +29,7 @@ export default async function Home() {
   const rows = await sql<{ category: string; count: number }[]>`
     SELECT category, COUNT(*)::int AS count
     FROM products
+    WHERE status = 'approved'
     GROUP BY category
   `;
 
@@ -49,6 +50,7 @@ export default async function Home() {
     SELECT id, name, description, price, category, discount_percent, image_url,
       EXISTS(SELECT 1 FROM favorite_products WHERE product_id = products.id AND user_id = ${userId}::uuid) AS is_favorited
     FROM products
+    WHERE status = 'approved'
     ORDER BY id DESC
     LIMIT 6
   `;

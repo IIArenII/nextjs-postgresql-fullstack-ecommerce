@@ -105,44 +105,80 @@ export function AccountForm({ user }: { user: any }) {
           </h3>
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
             You are currently a{" "}
-            <span className={`font-bold ${user.role === 'Seller' ? 'text-purple-600 dark:text-purple-400' : 'text-blue-600 dark:text-blue-400'}`}>
+            <span className={`font-bold ${
+              user.role === 'Seller' ? 'text-purple-600 dark:text-purple-400' : 
+              user.role === 'Admin' ? 'text-blue-600 font-black tracking-tighter' :
+              'text-blue-600 dark:text-blue-400'
+            }`}>
               {user.role}
             </span>.
-            {user.role === 'Buyer'
-              ? " Switch to Seller to list products and manage orders."
-              : " Switch to Buyer to purchase products."}
+            {user.role === 'Admin' 
+              ? " You have full platform control. Switching will temporarily hide Admin tools."
+              : user.role === 'Buyer'
+                ? " Switch to Seller to list products and manage orders."
+                : " Switch to Buyer to purchase products."}
           </p>
 
           <div className="p-3 rounded-xl bg-amber-50 border border-amber-100 dark:bg-amber-950/30 dark:border-amber-900/50 text-xs text-amber-700 dark:text-amber-400 mb-5">
             ⚠️ Switching roles changes what you can do immediately. Your previous data (orders, listings) stays in the database.
           </div>
 
-          <button
-            type="button"
-            disabled={roleChangePending}
-            onClick={async () => {
-              const newRole = user.role === 'Buyer' ? 'Seller' : 'Buyer';
-              setRoleChangePending(true);
-              try {
-                await changeRole(newRole);
-                toast.success(`Role changed to ${newRole}! Refreshing...`, {
-                    duration: 3000,
-                });
-                setTimeout(() => router.refresh(), 1000);
-              } catch (e: any) {
-                toast.error(e.message);
-              } finally {
-                setRoleChangePending(false);
-              }
-            }}
-            className={`w-full rounded-xl px-6 py-3 text-sm font-bold text-white transition disabled:opacity-50 hover:-translate-y-0.5 active:translate-y-0 ${
-              user.role === 'Buyer'
-                ? 'bg-purple-600 hover:bg-purple-700'
-                : 'bg-blue-600 hover:bg-blue-700'
-            }`}
-          >
-            {roleChangePending ? 'Switching...' : `Switch to ${user.role === 'Buyer' ? 'Seller' : 'Buyer'}`}
-          </button>
+          <div className="flex flex-col gap-3">
+            <button
+              type="button"
+              disabled={roleChangePending}
+              onClick={async () => {
+                let newRole: "Buyer" | "Seller" | "Admin";
+                if (user.role === 'Admin') {
+                  newRole = 'Buyer';
+                } else {
+                  newRole = user.role === 'Buyer' ? 'Seller' : 'Buyer';
+                }
+                
+                setRoleChangePending(true);
+                try {
+                  await changeRole(newRole);
+                  toast.success(`Role changed! Refreshing...`, { duration: 2000 });
+                  setTimeout(() => window.location.reload(), 800);
+                } catch (e: any) {
+                  toast.error(e.message);
+                } finally {
+                  setRoleChangePending(false);
+                }
+              }}
+              className={`w-full rounded-xl px-6 py-3 text-sm font-bold text-white transition disabled:opacity-50 hover:-translate-y-0.5 active:translate-y-0 ${
+                user.role === 'Admin' ? 'bg-slate-800' :
+                user.role === 'Buyer' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-blue-600 hover:bg-blue-700'
+              }`}
+            >
+              {roleChangePending ? 'Switching...' : 
+                user.role === 'Admin' ? 'Switch to Buyer Mode' :
+                `Switch to ${user.role === 'Buyer' ? 'Seller' : 'Buyer'}`}
+            </button>
+
+            {/* Special Restore Admin Button for authorized account */}
+            {user.email === 'aerenevli@gmail.com' && user.role !== 'Admin' && (
+              <button
+                type="button"
+                disabled={roleChangePending}
+                onClick={async () => {
+                  setRoleChangePending(true);
+                  try {
+                    await changeRole('Admin');
+                    toast.success("Admin powers restored! Refreshing...", { duration: 2000 });
+                    setTimeout(() => window.location.reload(), 800);
+                  } catch (e: any) {
+                    toast.error(e.message);
+                  } finally {
+                    setRoleChangePending(false);
+                  }
+                }}
+                className="w-full rounded-xl px-6 py-3 text-sm font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800/50"
+              >
+                {roleChangePending ? 'Restoring...' : '🔐 Restore Admin Credentials'}
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Password Section */}

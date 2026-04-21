@@ -124,6 +124,20 @@ export function ProductListing({
     <div className="relative group">
       <ProductCard product={product} />
       
+      {/* Status Badge */}
+      <div className="absolute top-2 left-2 z-10 pointer-events-none">
+        {product.status === 'pending' && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-amber-100/90 backdrop-blur-sm px-2 py-0.5 text-[9px] font-bold text-amber-700 shadow-sm border border-amber-200/50">
+            PENDING APPROVAL
+          </span>
+        )}
+        {product.status === 'rejected' && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-rose-100/90 backdrop-blur-sm px-2 py-0.5 text-[9px] font-bold text-rose-700 shadow-sm border border-rose-200/50">
+            REJECTED
+          </span>
+        )}
+      </div>
+
       {/* Quick Stock Edit */}
       <div className="mt-2 text-sm text-slate-500 flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200 shadow-sm dark:bg-slate-900 dark:border-slate-800">
         <span className="font-semibold text-xs ml-1">Stock:</span>

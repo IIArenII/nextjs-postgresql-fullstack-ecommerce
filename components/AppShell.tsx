@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ShoppingBag, Store, Tag, UserCircle, Package, Heart } from "lucide-react";
+import { ShoppingBag, Store, Tag, UserCircle, Package, Heart, ShieldAlert } from "lucide-react";
 import { LogoutButton } from "./LogoutButton";
 import { ThemeToggle } from "./ThemeToggle";
 import { getSession } from "@/lib/auth";
@@ -75,6 +75,17 @@ export async function AppShell({
               >
                 <Heart className="h-4 w-4" />
                 <span className="hidden md:inline">Favorites</span>
+              </Link>
+            )}
+            {session?.role === "Admin" && (
+              <Link
+                href="/admin"
+                title="Moderation"
+                aria-label="Moderation"
+                className="inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-bold text-blue-600 bg-blue-50/50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/50"
+              >
+                <ShieldAlert className="h-4 w-4" />
+                <span className="hidden md:inline">Moderation</span>
               </Link>
             )}
             {session && (

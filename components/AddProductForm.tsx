@@ -10,13 +10,17 @@ export function AddProductForm({ categories }: { categories: string[] }) {
 
   async function handleAddProduct(formData: FormData) {
     try {
-      await addProduct(formData);
-      toast.success("Product listed successfully!");
-      if (formRef.current) {
-        formRef.current.reset();
+      const result = await addProduct(formData);
+      if (result.success) {
+        toast.success("Product sent to the admin. Once approved, it will be published instantly.");
+        if (formRef.current) {
+          formRef.current.reset();
+        }
       }
     } catch (e: any) {
-      toast.error(e.message);
+      if (e.message !== "NEXT_REDIRECT") {
+        toast.error(e.message);
+      }
     }
   }
 

@@ -52,11 +52,19 @@ export async function updateAccount(formData: FormData) {
   return { success: true };
 }
 
-export async function changeRole(newRole: "Buyer" | "Seller") {
+export async function changeRole(newRole: "Buyer" | "Seller" | "Admin") {
   const session = await getSession();
   if (!session) throw new Error("Not authenticated");
 
-  if (newRole !== "Buyer" && newRole !== "Seller") {
+  // Only allow switching to Admin if users is the authorized account
+  const [user] = await sql`SELECT email FROM users WHERE id = ${session.userId}`;
+  const isAdminAuthorized = user?.email === 'aerenevli@gmail.com';
+
+  if (newRole === "Admin" && !isAdminAuthorized) {
+    throw new Error("Unauthorized to become Admin");
+  }
+
+  if (newRole !== "Buyer" && newRole !== "Seller" && newRole !== "Admin") {
     throw new Error("Invalid role");
   }
 

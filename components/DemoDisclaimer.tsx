@@ -8,7 +8,7 @@ export function DemoDisclaimer() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const hasSeenDisclaimer = localStorage.getItem('hasSeenDemoDisclaimer');
+    const hasSeenDisclaimer = localStorage.getItem('hasSeenDemoDisclaimer_v2');
     if (!hasSeenDisclaimer) {
       const timer = setTimeout(() => setIsVisible(true), 1000);
       return () => clearTimeout(timer);
@@ -17,10 +17,11 @@ export function DemoDisclaimer() {
 
   const handleDismiss = () => {
     setIsVisible(false);
-    localStorage.setItem('hasSeenDemoDisclaimer', 'true');
+    localStorage.setItem('hasSeenDemoDisclaimer_v2', 'true');
   };
 
   return (
+  <>
     <AnimatePresence>
       {isVisible && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -71,5 +72,13 @@ export function DemoDisclaimer() {
         </div>
       )}
     </AnimatePresence>
+    
+    {/* Persistent Demo Badge */}
+    <div className="fixed bottom-4 right-4 z-40 pointer-events-none">
+      <div className="bg-slate-900/80 backdrop-blur-sm text-white text-[10px] font-bold px-3 py-1.5 rounded-full border border-slate-700/50 shadow-lg dark:bg-white/10 dark:text-slate-300">
+        DEMO PROJECT
+      </div>
+    </div>
+  </>
   );
 }

@@ -9,6 +9,18 @@ export async function addProduct(formData: FormData) {
   const session = await getSession();
   if (!session || session.role !== "Seller") redirect("/auth");
 
+  // --- Rate Limiting (10 products per hour) ---
+  const [countResult] = await sql`
+    SELECT COUNT(*) as count 
+    FROM products 
+    WHERE seller_id = ${session.userId} 
+    AND created_at > NOW() - INTERVAL '1 hour'
+  `;
+  
+  if (parseInt(countResult.count, 10) >= 10) {
+    throw new Error("Security Alert: You have reached the limit of 10 new listings per hour. This is to prevent spam. Please try again later.");
+  }
+
   const name = (formData.get("name") as string).trim();
   const price = parseFloat(formData.get("price") as string);
   const stock_num = parseInt(formData.get("stock_num") as string, 10);
@@ -34,15 +46,18 @@ export async function addProduct(formData: FormData) {
     throw new Error("All fields are required. Price, Stock, and Discount (0-100) must be valid.");
   }
 
+  // All new products start as 'pending' for manual approval
   await sql`
-    INSERT INTO products (name, price, stock_num, description, category, seller_id, discount_percent, image_url)
-    VALUES (${name}, ${price}, ${stock_num}, ${description}, ${category}, ${session.userId}, ${discount_percent}, ${image_url})
+    INSERT INTO products (name, price, stock_num, description, category, seller_id, discount_percent, image_url, status)
+    VALUES (${name}, ${price}, ${stock_num}, ${description}, ${category}, ${session.userId}, ${discount_percent}, ${image_url}, 'pending')
   `;
 
-  redirect("/seller");
+  revalidatePath("/seller");
+  return { success: true };
 }
 
 export async function updateStock(formData: FormData) {
+// ... updateStock implementation stays the same ...
   const session = await getSession();
   if (!session || session.role !== "Seller") redirect("/auth");
 
@@ -91,11 +106,13 @@ export async function updateProduct(formData: FormData) {
     throw new Error("All fields are required and must be valid.");
   }
 
+  // Reset status to 'pending' when a product is updated so admin can re-verify it
   await sql`
     UPDATE products
-    SET name = ${name}, price = ${price}, description = ${description}, category = ${category}, discount_percent = ${discount_percent}, image_url = ${image_url}
+    SET name = ${name}, price = ${price}, description = ${description}, category = ${category}, discount_percent = ${discount_percent}, image_url = ${image_url}, status = 'pending'
     WHERE id = ${productId} AND seller_id = ${session.userId}
   `;
 
   revalidatePath("/seller");
+  return { success: true };
 }
