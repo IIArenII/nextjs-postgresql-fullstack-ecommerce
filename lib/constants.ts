@@ -20,12 +20,12 @@ export type Category = (typeof PRODUCT_CATEGORIES)[number];
 
 export const CATEGORY_IMAGES: Record<string, string> = {
   "Books": "/images/cat_books.webp",
-  "Electronics": "/images/electronics_minimalist",
+  "Electronics": "/images/cat_elec_minimal.webp",
   "Home & Garden": "/images/cat_home.webp",
   "Home & Living": "/images/cat_home.webp",
   "Clothing & Apparel": "/images/cat_fashion.webp",
   "Fashion": "/images/cat_fashion.webp",
-  "Sports & Outdoors": "/images/sports_minimalist",
+  "Sports & Outdoors": "/images/cat_sports_minimal.webp",
   "Food & Beverages": "/images/cat_food_beverages.png",
   "Gaming": "/images/cat_gaming.png",
   "Health & Beauty": "/images/cat_health_beauty.png",
@@ -35,5 +35,5 @@ export const CATEGORY_IMAGES: Record<string, string> = {
   "Pets": "/images/cat_pets.png",
   "Toys & Games": "/images/cat_toys_games.png",
   "Vehicles & Parts": "/images/cat_vehicles_parts.png",
-  "Other": "/images/elevate_minimalits"
+  "Other": "/images/hero_minimal.webp"
 };
