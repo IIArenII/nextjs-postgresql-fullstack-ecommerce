@@ -1,6 +1,7 @@
 import { sql } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import Link from "next/link";
+import Image from "next/image";
 import { AppShell } from "@/components/AppShell";
 import { ProductCard } from "@/components/ProductCard";
 import { ArrowRight, MoveRight, ShoppingBag } from "lucide-react";
@@ -104,10 +105,13 @@ export default async function Home() {
             className="w-full lg:flex-1 lg:max-w-sm xl:max-w-md md:hidden lg:block"
           >
             <div className="overflow-hidden rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800">
-              <img
+              <Image
                 src="/images/e-commerce-main-page-img.png"
                 alt="Modern workspace setup"
-                className="w-full h-full object-cover"
+                width={600}
+                height={450}
+                className="w-full h-auto object-cover"
+                priority
               />
             </div>
           </MotionDiv>
@@ -144,10 +148,12 @@ export default async function Home() {
                 href={`/categories/${encodeURIComponent(row.category)}`}
                 className="group relative block aspect-[3/4] md:aspect-[4/3] lg:aspect-square overflow-hidden rounded-2xl bg-slate-200 dark:bg-slate-800 transition shadow-sm hover:shadow-xl hover:-translate-y-1"
               >
-                <img 
-                  src={CATEGORY_IMAGES[row.category] || CATEGORY_IMAGES["Other"]} 
-                  alt={row.category} 
-                  className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
+                <Image
+                  src={CATEGORY_IMAGES[row.category] || CATEGORY_IMAGES["Other"]}
+                  alt={row.category}
+                  fill
+                  className="object-cover transition duration-700 group-hover:scale-110"
+                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 p-4 sm:p-6 text-white transform transition duration-500 group-hover:translate-y-[-4px]">

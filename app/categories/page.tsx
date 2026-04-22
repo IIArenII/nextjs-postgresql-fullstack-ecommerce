@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { sql } from "@/lib/db";
 import { AppShell } from "@/components/AppShell";
 import { PRODUCT_CATEGORIES, CATEGORY_IMAGES } from "@/lib/constants";
@@ -39,10 +40,12 @@ export default async function CategoriesPage() {
             href={`/categories/${encodeURIComponent(row.category)}`}
             className="group relative aspect-[3/4] overflow-hidden rounded-2xl sm:rounded-3xl bg-slate-200 dark:bg-slate-800 shadow-sm transition hover:shadow-xl hover:-translate-y-1"
           >
-            <img 
-              src={CATEGORY_IMAGES[row.category] || CATEGORY_IMAGES["Other"]} 
-              alt={row.category} 
-              className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
+            <Image
+              src={CATEGORY_IMAGES[row.category] || CATEGORY_IMAGES["Other"]}
+              alt={row.category}
+              fill
+              className="object-cover transition duration-700 group-hover:scale-110"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             />
             {/* Overlay with subtle blur for the text box area */}
             <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
