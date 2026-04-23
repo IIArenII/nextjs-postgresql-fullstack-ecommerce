@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import { CartProvider } from "@/lib/cart-context";
 import { DemoDisclaimer } from "@/components/DemoDisclaimer";
+import { AuthUrlCleaner } from "@/components/AuthUrlCleaner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -89,6 +90,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <CartProvider>
+          <AuthUrlCleaner />
           {children}
           <DemoDisclaimer />
           <script
