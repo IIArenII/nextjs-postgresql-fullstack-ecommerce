@@ -57,54 +57,54 @@ export function ProductCard({
         )}
         <div className="absolute inset-0 bg-black/0 transition duration-500 group-hover:bg-black/5" />
       </Link>
-      <div className="p-5">
-        <div className="flex items-start justify-between gap-3">
+      <div className="p-3 sm:p-5">
+        <div className="flex items-start justify-between gap-2 sm:gap-3">
           <Link
             href={`/products/${product.id}`}
-            className="text-base font-semibold leading-snug tracking-tight text-slate-900 hover:text-blue-600 dark:text-slate-50 dark:hover:text-blue-400"
+            className="text-xs sm:text-base font-bold leading-tight sm:leading-snug tracking-tight text-slate-900 hover:text-blue-600 dark:text-slate-50 dark:hover:text-blue-400 line-clamp-1 sm:line-clamp-2"
           >
             {product.name}
           </Link>
-          <div className="shrink-0 -mr-2">
+          <div className="shrink-0 -mr-1 sm:-mr-2">
             <FavoriteButton productId={product.id} isFavorited={product.is_favorited} />
           </div>
         </div>
 
-        <p className="mt-2 line-clamp-2 text-sm text-slate-600 dark:text-slate-300">
+        <p className="mt-1.5 hidden sm:line-clamp-2 text-sm text-slate-600 dark:text-slate-300">
           {product.description}
         </p>
 
         {product.stock_num !== undefined && (
-          <p className="mt-2 text-xs font-medium">
+          <p className="mt-1.5 text-[10px] sm:text-xs font-semibold">
             {product.stock_num > 0 ? (
-              <span className="text-emerald-600 dark:text-emerald-400">
-                {product.stock_num} in stock
+              <span className="text-emerald-500 dark:text-emerald-400">
+                {product.stock_num} IN STOCK
               </span>
             ) : (
-              <span className="text-red-500 font-bold dark:text-red-400">
-                Out of stock
+              <span className="text-rose-500 dark:text-rose-400">
+                OUT OF STOCK
               </span>
             )}
           </p>
         )}
 
-        <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-900">
+        <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-50 pt-3 dark:border-slate-900">
           <div className="flex flex-col">
             {discountPercent > 0 && (
-              <span className="text-xs text-slate-400 line-through">
+              <span className="text-[10px] text-slate-400 line-through">
                 {formatCurrencyUSD(originalPrice)}
               </span>
             )}
-            <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+            <span className="text-base sm:text-lg font-black tracking-tight text-slate-900 dark:text-white">
               {formatCurrencyUSD(discountedPrice)}
             </span>
           </div>
           <Link
             href={`/products/${product.id}`}
-            className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
+            className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-slate-900 px-3 py-2 text-[10px] sm:text-sm font-bold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
           >
-            Details{" "}
-            <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+            DETAILS{" "}
+            <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 transition group-hover:translate-x-0.5" />
           </Link>
         </div>
       </div>

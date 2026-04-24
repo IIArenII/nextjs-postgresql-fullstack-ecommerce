@@ -4,6 +4,7 @@ import { sql } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { sendProductPendingEmail } from "@/lib/email";
 
 export async function addProduct(formData: FormData) {
   const session = await getSession();
@@ -51,6 +52,12 @@ export async function addProduct(formData: FormData) {
     INSERT INTO products (name, price, stock_num, description, category, seller_id, discount_percent, image_url, status)
     VALUES (${name}, ${price}, ${stock_num}, ${description}, ${category}, ${session.userId}, ${discount_percent}, ${image_url}, 'pending')
   `;
+
+  // Send email notification to seller
+  const [user] = await sql`SELECT email FROM users WHERE id = ${session.userId}`;
+  if (user?.email) {
+    await sendProductPendingEmail(user.email, name);
+  }
 
   revalidatePath("/seller");
   return { success: true };
@@ -112,6 +119,12 @@ export async function updateProduct(formData: FormData) {
     SET name = ${name}, price = ${price}, description = ${description}, category = ${category}, discount_percent = ${discount_percent}, image_url = ${image_url}, status = 'pending'
     WHERE id = ${productId} AND seller_id = ${session.userId}
   `;
+
+  // Send email notification to seller
+  const [user] = await sql`SELECT email FROM users WHERE id = ${session.userId}`;
+  if (user?.email) {
+    await sendProductPendingEmail(user.email, name);
+  }
 
   revalidatePath("/seller");
   return { success: true };

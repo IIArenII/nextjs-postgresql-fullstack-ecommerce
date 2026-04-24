@@ -109,3 +109,81 @@ export async function sendOrderNotificationToSeller({
     return { success: false, error: err };
   }
 }
+
+export async function sendProductPendingEmail(sellerEmail: string, productName: string) {
+  try {
+    console.log("\n========================================================");
+    console.log("📧 PRODUCT PENDING APPROVAL");
+    console.log(`To Seller: ${sellerEmail}`);
+    console.log(`Product: ${productName}`);
+    console.log("========================================================\n");
+
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASS) return { success: true };
+
+    const mailOptions = {
+      from: `"Storefront" <${process.env.GMAIL_USER}>`,
+      to: sellerEmail,
+      subject: `Product Received: ${productName}`,
+      html: `
+        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+          <h2 style="color: #2563eb;">Product Under Review</h2>
+          <p>We've received your product listing for <strong>${productName}</strong>.</p>
+          <p>Our team is currently reviewing it to ensure it meets our quality and safety standards.</p>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+          <p style="font-size: 14px; color: #64748b;">
+            This usually takes less than 24 hours. You'll receive another email as soon as it's approved and live on the marketplace.
+          </p>
+          <p style="font-size: 12px; color: #94a3b8; margin-top: 30px;">
+            Thank you for selling with Storefront!
+          </p>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    return { success: true };
+  } catch (err) {
+    console.error("Failed to send pending email:", err);
+    return { success: false, error: err };
+  }
+}
+
+export async function sendProductStatusEmail(sellerEmail: string, productName: string, status: 'approved' | 'rejected') {
+  try {
+    const isApproved = status === 'approved';
+    console.log("\n========================================================");
+    console.log(`📧 PRODUCT ${status.toUpperCase()}`);
+    console.log(`To Seller: ${sellerEmail}`);
+    console.log(`Product: ${productName}`);
+    console.log("========================================================\n");
+
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASS) return { success: true };
+
+    const mailOptions = {
+      from: `"Storefront" <${process.env.GMAIL_USER}>`,
+      to: sellerEmail,
+      subject: isApproved ? `Product Published: ${productName}` : `Action Required: Product ${productName}`,
+      html: `
+        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+          <h2 style="color: ${isApproved ? '#10b981' : '#ef4444'};">${isApproved ? 'Great news! Your product is live.' : 'Update on your product submission'}</h2>
+          <p>Your product <strong>${productName}</strong> has been ${status} by our moderation team.</p>
+          ${isApproved 
+            ? `<p>It's now visible to all customers on the marketplace. Check it out and start sharing the link!</p>`
+            : `<p>Unfortunately, your product could not be published at this time. Please review our guidelines and update your listing via the Seller Dashboard.</p>`
+          }
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/seller" 
+             style="display: inline-block; padding: 10px 20px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
+             Visit Seller Dashboard
+          </a>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    return { success: true };
+  } catch (err) {
+    console.error("Failed to send status email:", err);
+    return { success: false, error: err };
+  }
+}
